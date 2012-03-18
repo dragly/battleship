@@ -18,12 +18,17 @@ var servOurBoats = new Array();
 var servTheirBoats = new Array();
 
 var myUser;
+var currentGameIndex = 0;
 
-var gameId;
+var games = new Array();
 
 var mousePos = new Array();
 
 var xmlHttpRequest;
+
+function Game() {
+    this.gameID = 0;
+}
 
 function User() {
     this.userID = 0;
@@ -94,15 +99,15 @@ function receivedNewUser() {
     }
 }
 
-Object.prototype.clone = function() {
-            var newObj = (this instanceof Array) ? [] : {};
-            for (i in this) {
-                if (i == 'clone') continue;
-                if (this[i] && typeof this[i] == "object") {
-                    newObj[i] = this[i].clone();
-                } else newObj[i] = this[i]
-            } return newObj;
-        };
+//Object.prototype.clone = function() {
+//            var newObj = (this instanceof Array) ? [] : {};
+//            for (i in this) {
+//                if (i == 'clone') continue;
+//                if (this[i] && typeof this[i] == "object") {
+//                    newObj[i] = this[i].clone();
+//                } else newObj[i] = this[i]
+//            } return newObj;
+//        };
 
 function Boat(size) {
     this.index = -1;
@@ -261,28 +266,32 @@ function showMenu() {
     ctx.fillText("Play game", 10, 40);
 }
 
-function receivedRandomGame() {
-    console.log("State changed " + xmlHttpRequest.status + " " + xmlHttpRequest.responseText);
-    if(xmlHttpRequest.readyState == 4 && xmlHttpRequest.status == 200) {
-        console.log(xmlHttpRequest.responseText);
-        menuState = 1;
-        drawMap();
-    }
+function receivedRandomGame(responseText) {
+    console.log(responseText);
+    var gameData = JSON.parse(responseText);
+    var game = new Game();
+    game.gameID = gameData.gameID;
+    games.push(game);
+    currentGameIndex = games.length - 1;
+    menuState = 1;
+    drawMap();
     // TODO Add error handling if no game received or we have timed out
 }
 
 function requestRandomGame() {
     console.log("Requesting random game");
     xmlHttpRequest = new XMLHttpRequest();
+    console.log(JSON.stringify(myUser));
     var params = "json=" + JSON.stringify(myUser);
-    xmlHttpRequest.open("POST", "http://localhost:8888/randomGame", true);
-    //Send the proper header information along with the request
-    xmlHttpRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    xmlHttpRequest.setRequestHeader("Content-length", params.length);
-    xmlHttpRequest.setRequestHeader("Connection", "close");
-    // connect the ready state
-    xmlHttpRequest.onreadystatechange = receivedRandomGame;
-    xmlHttpRequest.send(params);
+    $.post("http://localhost:8888/randomGame", params, receivedRandomGame);
+//    xmlHttpRequest.open("POST", "http://localhost:8888/randomGame", true);
+//    //Send the proper header information along with the request
+//    xmlHttpRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+//    xmlHttpRequest.setRequestHeader("Content-length", params.length);
+//    xmlHttpRequest.setRequestHeader("Connection", "close");
+//    // connect the ready state
+//    xmlHttpRequest.onreadystatechange = receivedRandomGame;
+//    xmlHttpRequest.send(params);
 }
 
 function clear() {
@@ -410,24 +419,4 @@ function canvasMouseDown(e) {
             }
         }
     }
-}
-
-function getCursorPosition(e) {
-    var x;
-    var y;
-    if (e.pageX || e.pageY) {
-        x = e.pageX;
-        y = e.pageY;
-    }
-    else {
-        x = e.clientX + document.body.scrollLeft +
-                document.documentElement.scrollLeft;
-        y = e.clientY + document.body.scrollTop +
-                document.documentElement.scrollTop;
-    }
-    x -= canvas.offsetLeft;
-    y -= canvas.offsetTop;
-
-    mousePos[0] = x;
-    mousePos[1] = y;
 }

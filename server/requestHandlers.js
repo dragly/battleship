@@ -1,10 +1,11 @@
 var exec = require("child_process").exec;
 var querystring = require("querystring");
 
-var curUserId = 0;
+var currentUserID = 0;
+var currentGameID = 0;
 var users = new Array();
 var games = new Array();
-var waitingGame = 0;
+var waitingGame = new Array();
 
 function Boat() {
     this.index = 0;
@@ -36,39 +37,44 @@ function newUser(response, postData) {
     console.log("Request handler 'newUser' was called.");
     response.writeHead(200, {"Content-Type": "text/plain\nAccess-Control-Allow-Origin: *"});
     var user = new User();
-    user.userID = curUserId;
+    user.userID = currentUserID;
     user.password = "12345";
-    users[curUserId] = user;
+    users[currentUserID] = user;
     response.write(JSON.stringify(user));
     response.end();
-    curUserId ++;
+    currentUserID ++;
 }
 
 function randomGame(response, postData) {
     console.log("Request handler 'randomGame' was called.");
     response.writeHead(200, {"Content-Type": "text/plain\nAccess-Control-Allow-Origin: *"});
-    if(waitingGame === 0) {
-        var game = new Game();
+    console.log("Received post data: " + postData);
 
-        var post = querystring.parse(postData);
-        console.log(post);
-        console.log(post.json);
-        var receivedUser = JSON.parse(post.json);
-        console.log(receivedUser.userID);
-        console.log("Blah...");
+    var post = querystring.parse(postData);
+    var receivedUser = JSON.parse(post.json);
+    if(waitingGame.length < 1) {
+        console.log("Waiting game was 0");
 
         // TODO authenticate
 
+        var game = new Game();
         game.p1user = users[receivedUser.userID];
+        game.gameID = currentGameID;
 
         console.log("Made game with user " + game.p1user.password);
         response.write(JSON.stringify(game));
 
         games.push(game);
 
-        waitingGame = game;
+        waitingGame.push(game);
+        currentGameID++;
     } else {
-
+        var game = waitingGame[0];
+        console.log(game);
+        console.log("Adding user to game " + game.gameID);
+        game.p2user = users[receivedUser.userID];
+        response.write(JSON.stringify(game));
+        waitingGame.pop();
     }
 
     response.end();
