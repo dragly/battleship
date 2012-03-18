@@ -1,0 +1,1 @@
+{"requestUrl":"http://localhost:8888/randomGame","requestMethod":"POST","requestBody":"json={\"userID\":0,\"password\":\"1345\",\"username\":\"bla\"}","headers":[]}
