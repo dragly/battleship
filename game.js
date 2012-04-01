@@ -22,7 +22,9 @@ var currentGameIndex = 0;
 
 var games = new Array();
 
-var mousePos = new Array();
+var isDragging = -1;
+
+//var mousePos = new Array();
 
 var xmlHttpRequest;
 
@@ -76,10 +78,30 @@ function main() {
             ourBoats[i] = new Boat(size);
             ourBoats[i].setIndex(i);
         }
-
+	
         showMenu();
     }
 }
+
+
+function getCursorPosition(event) {
+    var totalOffsetX = 0;
+    var totalOffsetY = 0;
+    var currentElement = canvas;
+
+    do {
+        totalOffsetX += currentElement.offsetLeft;
+        totalOffsetY += currentElement.offsetTop;
+    }
+    while (currentElement = currentElement.offsetParent)
+
+    var canvasX = event.pageX - totalOffsetX;
+    var canvasY = event.pageY - totalOffsetY;
+    //console.log(event.pageX + " " + currentElement.offsetLeft);
+    return { x: canvasX, y: canvasY }
+}
+//HTMLCanvasElement.prototype.relMouseCoords = relMouseCoords;
+
 
 function requestNewUser() {
     console.log("Requesting!");
@@ -139,7 +161,8 @@ function Boat(size) {
              this.x = tileMargin + this.column * (tileSize + tileMargin) + tileSize / 4;
              this.y = tileMargin + this.row * (tileSize + tileMargin) + tileSize / 4;
          }
-    this.isClicked = function(x,y) {
+         this.isClicked = function (x, y) {
+             console.log("boat index: " + this.index + " pos:" + this.x + "," + this.y);
              var clickedMe = x > this.x && x < this.x + this.width && y > this.y && y < this.y + this.height;
              return clickedMe;
          }
@@ -326,26 +349,27 @@ function drawMap() {
     }
 }
 
-var isDragging = -1;
-
 function canvasMouseMove(e) {
-    getCursorPosition(e);
-    var x = mousePos[0];
-    var y = mousePos[1];
+
+    var mousePos = getCursorPosition(e);
+
     if(isDragging > -1) {
         var boat = ourBoats[isDragging];
-        boat.x = x - boat.width / 2;
-        boat.y = y - boat.height / 2;
+        boat.x = mousePos.x - boat.width / 2;
+        boat.y = mousePos.y - boat.height / 2;
         drawMap();
     }
 }
 
 function canvasMouseUp(e) {
-    getCursorPosition(e);
-    var x = mousePos[0];
-    var y = mousePos[1];
-    if(menuState == 0) {
+
+    var mousePos = getCursorPosition(e);
+    var x = mousePos.x;
+    var y = mousePos.y;
+
+    if (menuState == 0) {
         requestRandomGame();
+        
     } else if(isDragging > -1) {
         console.log("Finding best fit!");
         var boat = ourBoats[isDragging];
@@ -409,12 +433,13 @@ function canvasMouseUp(e) {
 }
 
 function canvasMouseDown(e) {
-    getCursorPosition(e);
-    var x = mousePos[0];
-    var y = mousePos[1];
-    if(menuState == 1 && gameState == 0) {
+    var mousePos = getCursorPosition(e);
+
+    if (menuState == 1 && gameState == 0) {
+        console.log("spotted " + nBoats + "boats. With mouse coord: " + mousePos.x + "," + mousePos.y);
         for(var i = 0; i < nBoats; i++) {
-            if(ourBoats[i].isClicked(x,y)) {
+            if (ourBoats[i].isClicked(mousePos.x, mousePos.y)) {
+                console.log("boat clicked!!");
                 isDragging = i;
             }
         }
