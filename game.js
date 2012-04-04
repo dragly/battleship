@@ -48,6 +48,7 @@ function main() {
     canvas = document.getElementById("canvas");
     if (canvas.getContext) {
         ctx = canvas.getContext("2d");
+        
         // set up UI stuff
         tileSize = canvas.width / (nCols + 2);
 
@@ -82,26 +83,6 @@ function main() {
         showMenu();
     }
 }
-
-
-function getCursorPosition(event) {
-    var totalOffsetX = 0;
-    var totalOffsetY = 0;
-    var currentElement = canvas;
-
-    do {
-        totalOffsetX += currentElement.offsetLeft;
-        totalOffsetY += currentElement.offsetTop;
-    }
-    while (currentElement = currentElement.offsetParent)
-
-    var canvasX = event.pageX - totalOffsetX;
-    var canvasY = event.pageY - totalOffsetY;
-    //console.log(event.pageX + " " + currentElement.offsetLeft);
-    return { x: canvasX, y: canvasY }
-}
-//HTMLCanvasElement.prototype.relMouseCoords = relMouseCoords;
-
 
 function requestNewUser() {
     console.log("Requesting!");
@@ -283,12 +264,6 @@ var parseCast = function (key, value) {
     return value;
 }
 
-function showMenu() {
-    menuState = 0;
-    ctx.fillText("Menu", 10, 10);
-    ctx.fillText("Play game", 10, 40);
-}
-
 function receivedRandomGame(responseText) {
     console.log(responseText);
     var gameData = JSON.parse(responseText);
@@ -317,8 +292,17 @@ function requestRandomGame() {
 //    xmlHttpRequest.send(params);
 }
 
+
+/************* DRAWING *************/
+
 function clear() {
     ctx.clearRect(0,0,canvas.width,canvas.height);
+}
+
+function showMenu() {
+    menuState = 0;
+    ctx.fillText("Menu", 10, 10);
+    ctx.fillText("Play game", 10, 40);
 }
 
 function drawMap() {
@@ -348,6 +332,26 @@ function drawMap() {
         }
     }
 }
+
+/************* MOUSE HANDLING *************/
+
+function getCursorPosition(event) {
+    var totalOffsetX = 0;
+    var totalOffsetY = 0;
+    var currentElement = canvas;
+
+    do {
+        totalOffsetX += currentElement.offsetLeft;
+        totalOffsetY += currentElement.offsetTop;
+    }
+    while (currentElement = currentElement.offsetParent)
+
+    var canvasX = event.pageX - totalOffsetX;
+    var canvasY = event.pageY - totalOffsetY;
+    //console.log(event.pageX + " " + currentElement.offsetLeft);
+    return { x: canvasX, y: canvasY }
+}
+//HTMLCanvasElement.prototype.relMouseCoords = relMouseCoords;
 
 function canvasMouseMove(e) {
 
