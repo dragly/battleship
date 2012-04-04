@@ -97,7 +97,7 @@ function placeBomb(response, postData) {
 function status(response, postData) {
     console.log("Request handler 'start' was called.");
     response.writeHead(200, {"Content-Type": "text/plain\nAccess-Control-Allow-Origin: *"});
-    response.write("Users\n\n");
+    response.write("Users (test)\n\n");
     response.write(JSON.stringify(users) + "\n");
     response.write("Games\n\n");
     response.write(JSON.stringify(games) + "\n");
