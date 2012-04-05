@@ -24,7 +24,7 @@ var games = new Array();
 
 var isDragging = -1;
 
-var serverUrl = "localhost:80";
+var serverUrl = "localhost:8888";
 
 //var mousePos = new Array();
 
