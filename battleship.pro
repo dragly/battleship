@@ -11,4 +11,9 @@ OTHER_FILES += \
     server/requestHandlers.js \
     server/index.js \
     server/game.js \
-    server/boat.js
+    server/boat.js \
+    todo.txt \
+    communicator.js \
+    index.html \
+    mousehelper.js \
+    mainmenu.js
