@@ -35,16 +35,15 @@ ButtonHandler.prototype.hideAll = function () {
 
 ButtonHandler.prototype.draw = function (ctx) {
 
-    for (var i = 0; i < this.buttons.length; i++)  {
-        console.log("hmm");
+    for (var i = 0; i < this.buttons.length; i++) {
+
         if (this.buttons[i].isVisible) {
-        console.log("blubb");
             this.buttons[i].draw(ctx);
         }
     }
 }
 
-function Button(width, height, x, y, text,event) {
+function Button(buttonHandler, x, y, width, height, text, event) {
     //TODO: Pos and size should be relative, text should be removed and replaced with images for states "Down,Up,Inactive"
     this.width = width;
     this.height = height;
@@ -55,6 +54,7 @@ function Button(width, height, x, y, text,event) {
     this.isVisible = true;
     this.isDown = false;
     this.clickEvent = event; //event triggered on key-release
+    buttonHandler.addButton(this);
 }
 
 Button.prototype.isWithinBounds = function (x, y) {
@@ -63,7 +63,7 @@ Button.prototype.isWithinBounds = function (x, y) {
 Button.prototype.mousePressed = function () {
     this.isDown = true;
 }
-Button.prototype.mouseReleased = function () {
+Button.prototype.mouseReleased = function (x,y) {
     this.isDown = false;
 
     if (this.isWithinBounds(x, y)) {
@@ -81,6 +81,6 @@ Button.prototype.draw = function (ctx) {
     ctx.fillStyle = "rgb(200,50,0)";
     ctx.fillRect(this.x, this.y, this.width, this.height);
     ctx.fillStyle = "rgb(255,255,255)";
-    ctx.fillText(this.text, this.x + 5, this.y + 5);
+    ctx.fillText(this.text, this.x + 10, this.y + 30);
 }
     
