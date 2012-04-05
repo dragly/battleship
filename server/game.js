@@ -13,3 +13,5 @@ function Game() {
     this.p1HitMask = new Array();
     this.p2HitMask = new Array();
 }
+
+exports.Game = Game;
