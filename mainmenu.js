@@ -36,7 +36,7 @@ function MainMenu() {
     this.gameState = GameState.PlaceBoats; // 0 - place boats, 1 - waiting for opponent, 2 - your turn, 3 - their turn
     this.canvas = 0;
     this.ctx = 0;
-    this.user = 0;
+    this.user = null;
     this.isDragging = -1;
 }
 MainMenu.prototype.clear = function() {
@@ -62,12 +62,12 @@ MainMenu.prototype.initApplication = function() {
             tileSize = this.canvas.width / (nCols + 2);
 
             // TODO add check if user exists already. We presume now that no user is created.
-            if(this.user === 0) {
+            if(this.user === null) {
                 this.showLoginScreen();
             }
         }
 MainMenu.prototype.showLoginScreen = function() {
-            this.menuState = 3;
+            this.menuState = MenuState.Login;
             this.redraw();
         }
 MainMenu.prototype.showGameList = function() {

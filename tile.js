@@ -41,7 +41,7 @@ Tile.prototype.isClicked = function (x, y) {
                 break;
             case 3:
                 break;
-            default::
+            default:
                 break;
         }
     }
