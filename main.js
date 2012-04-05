@@ -12,10 +12,10 @@ var theirTiles = new Array();
 var ourBoats = new Array();
 var theirBoats = new Array();
 
-var servOurTiles = new Array();
-var servTheirTiles = new Array();
-var servOurBoats = new Array();
-var servTheirBoats = new Array();
+//var servOurTiles = new Array();
+//var servTheirTiles = new Array();
+//var servOurBoats = new Array();
+//var servTheirBoats = new Array();
 
 var myUser;
 var currentGameIndex = 0;
@@ -50,9 +50,10 @@ function main() {
         for(var i = 0; i < nRows * nCols; i++) {
             ourTiles[i] = new Tile(i);
             theirTiles[i] = new Tile(i);
-            servOurTiles[i] = new Tile(i);
-            servTheirTiles[i] = new Tile(i);
+            //servOurTiles[i] = new Tile(i);
+            //servTheirTiles[i] = new Tile(i);
         }
+        //TODO dette skjer for tidlig, må flyttes
         for(var i = 0; i < nBoats; i++) {
             switch(i) {
             case 0:
@@ -76,6 +77,7 @@ function main() {
     }
 }
 
+//til comm
 function requestNewUser() {
     console.log("Requesting!");
     xmlHttpRequest = new XMLHttpRequest();
@@ -94,9 +96,10 @@ function receivedNewUser() {
     }
 }
 
+// TODO Moved to communication class and logic to server
+// TODO Rename and change logic! Find calls...
 function getDataFromServer() {
     // server sends back the data
-
     var dataStringOur = JSON.stringify(servOurTiles);
     updateTiles(dataStringOur, ourTiles);
 
@@ -107,6 +110,7 @@ function getDataFromServer() {
     drawMap();
 }
 
+// TODO Rewrite to receive data from comm class
 function updateTiles(dataString, localTiles) {
     console.log(dataString);
     var serverTiles = JSON.parse(dataString, parseCast);
@@ -119,6 +123,7 @@ function updateTiles(dataString, localTiles) {
     }
 }
 
+// TODO Move this to comm class and update server to actually store data
 function sendBoatsToServer() {
     // send boats to server
     // server updates the data
@@ -141,6 +146,7 @@ function sendBoatsToServer() {
     getDataFromServer();
 }
 
+// TODO Move to comm class
 function shootTile(index) {
     // send index to server
     // server updates the data
@@ -149,6 +155,7 @@ function shootTile(index) {
     getDataFromServer();
 }
 
+// TODO Move to helper class (comm?)
 var parseCast = function (key, value) {
     var type;
     if (value && typeof value === 'object') {
@@ -160,6 +167,7 @@ var parseCast = function (key, value) {
     return value;
 }
 
+// TODO Move to comm class
 function receivedRandomGame(responseText) {
     console.log(responseText);
     var gameData = JSON.parse(responseText);
@@ -172,6 +180,7 @@ function receivedRandomGame(responseText) {
     // TODO Add error handling if no game received or we have timed out
 }
 
+// TODO Move to comm class
 function requestRandomGame() {
     console.log("Requesting random game");
     xmlHttpRequest = new XMLHttpRequest();
@@ -190,6 +199,7 @@ function requestRandomGame() {
 
 
 /************* DRAWING *************/
+// TODO Wrap into new MainGame class
 
 function clear() {
     ctx.clearRect(0,0,canvas.width,canvas.height);
@@ -230,6 +240,7 @@ function drawMap() {
 }
 
 /************* MOUSE HANDLING *************/
+// TODO Move getCursorPosition to MouseHelper class
 
 function getCursorPosition(event) {
     var totalOffsetX = 0;
@@ -248,6 +259,7 @@ function getCursorPosition(event) {
     return { x: canvasX, y: canvasY }
 }
 //HTMLCanvasElement.prototype.relMouseCoords = relMouseCoords;
+// TODO Wrap into MainGame class
 
 function canvasMouseMove(e) {
 
