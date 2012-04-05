@@ -3,25 +3,24 @@ function ButtonHandler() { //returns true if press was handled
     this.currentlyPressedButtonIndex = -1;
     this.buttons = new Array();
 }
-ButtonHandler.prototype.addButton = function (width, height, x, y, text, event) {
-    var btn = new Button(width, height, x, y, text, event);
+ButtonHandler.prototype.addButton = function (btn) {
     this.buttons.push(btn);
     return btn;
 }
 ButtonHandler.prototype.mouseReleased = function (x, y) {
             //Has to be called every time the mouse is released, even if other handler catches the event
-    if (currentlyPressedButtonIndex != -1) {
-        var ret = buttons[currentlyPressedButtonIndex].mouseReleased(x,y);
-        currentlyPressedButtonIndex = -1;
+    if (this.currentlyPressedButtonIndex != -1) {
+        var ret = this.buttons[this.currentlyPressedButtonIndex].mouseReleased(x,y);
+        this.currentlyPressedButtonIndex = -1;
         return ret;
     }
     return false;
 }
 ButtonHandler.prototype.mousePressed = function (x, y) {
-    for (var i = 0; i < this.buttons.length(); i++) {
-        if (buttons[i].isWithinBounds(x, y)) {
+    for (var i = 0; i < this.buttons.length; i++) {
+        if (this.buttons[i].isVisible && this.buttons[i].isActive && this.buttons[i].isWithinBounds(x, y)) {
             this.currentlyPressedButtonIndex = i;
-            buttons[i].mousePressed();
+            this.buttons[i].mousePressed();
             return true;
         }
     }
@@ -29,8 +28,19 @@ ButtonHandler.prototype.mousePressed = function (x, y) {
 }
 
 ButtonHandler.prototype.hideAll = function () {
-    for (var i = 0; i < this.buttons.length(); i++) {
+    for (var i = 0; i < this.buttons.length; i++) {
         this.buttons[i].isVisible = false;
+    }
+}
+
+ButtonHandler.prototype.draw = function (ctx) {
+
+    for (var i = 0; i < this.buttons.length; i++)  {
+        console.log("hmm");
+        if (this.buttons[i].isVisible) {
+        console.log("blubb");
+            this.buttons[i].draw(ctx);
+        }
     }
 }
 
@@ -62,13 +72,15 @@ Button.prototype.mouseReleased = function () {
     }
     return false;
 }
-Button.prototype.show() {
+Button.prototype.show = function () {
     this.isVisible = true;
 }
 
-Button.prototype.draw = function () {
+Button.prototype.draw = function (ctx) {
+
     ctx.fillStyle = "rgb(200,50,0)";
     ctx.fillRect(this.x, this.y, this.width, this.height);
+    ctx.fillStyle = "rgb(255,255,255)";
     ctx.fillText(this.text, this.x + 5, this.y + 5);
 }
     
