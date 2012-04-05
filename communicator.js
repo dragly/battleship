@@ -30,17 +30,42 @@ Communicator.prototype.receivedNewUser = function(responseText, callback) {
             callback(0, myUser);
         }
 
-Communicator.prototype.requestRandomGame = function(callback) {
+Communicator.prototype.requestRandomGame = function(user, callback) {
+            var self = this;
             console.log("Requesting random game");
-            var params = "json=" + JSON.stringify(myUser);
-            $.post("http://" + serverUrl + "/randomGame", params, function(responseText, callback) {receivedRandomGame(responseText, callback); });
+            var params = "json=" + JSON.stringify(user);
+            $.post("http://" + this.serverUrl + "/randomGame", params, function(responseText) { self.receivedRandomGame(responseText, callback); });
         }
 
 Communicator.prototype.receivedRandomGame = function(responseText, callback) {
-            console.log(responseText);
+            console.log("Received random game!");
             var gameData = JSON.parse(responseText);
             var game = new Game();
             game.gameID = gameData.gameID;
+            // TODO Process game data
+            console.log(gameData);
             // TODO Add error handling if no game received or we have timed out
             callback(0, game);
+        }
+
+Communicator.prototype.requestGameList = function(user, callback) {
+            var self = this;
+            console.log("Requesting game list");
+            var params = "json=" + JSON.stringify(user);
+            $.post("http://" + this.serverUrl + "/gameList", params, function(responseText) { self.receivedGameList(responseText, callback); });
+
+        }
+
+Communicator.prototype.receivedGameList = function(responseText, callback) {
+            console.log("Received game list!");
+            var gamesData = JSON.parse(responseText);
+            var games = new Array();
+            for(var i = 0; i < gamesData.length; i++) {
+                var gameData = gamesData[i];
+                var game = new Game();
+                game.gameID = gameData.gameID;
+                games.push(game);
+            }
+            // TODO Add error handling if no game received or we have timed out
+            callback(0, games);
         }

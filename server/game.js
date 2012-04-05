@@ -14,4 +14,12 @@ function Game() {
     this.p2HitMask = new Array();
 }
 
+Game.prototype.hasUser = function(user) {
+            if(user.userID === this.p1user.userID || user.userID === this.p2user.userID) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
 exports.Game = Game;

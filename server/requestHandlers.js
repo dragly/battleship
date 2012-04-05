@@ -1,83 +1,89 @@
 var exec = require("child_process").exec;
 var querystring = require("querystring");
+var GameManager = require("./gamemanager").GameManager;
+var UserManager = require("./usermanager").UserManager;
 var Game = require("./game").Game;
 var Boat = require("./boat").Boat;
 var User = require("./user").User;
 
-var currentUserID = 0;
-var currentGameID = 0;
-var users = new Array();
-var games = new Array();
-var waitingGame = new Array();
+var defaultHeader = "text/plain\nAccess-Control-Allow-Origin: *";
+
+var userManager;
+var gameManager;
+
+// TODO Should be initialized elsewhere?
+userManager = new UserManager();
+gameManager = new GameManager(userManager);
 
 function newUser(response, postData) {
     console.log("Request handler 'newUser' was called.");
-    response.writeHead(200, {"Content-Type": "text/plain\nAccess-Control-Allow-Origin: *"});
-    var user = new User();
-    user.userID = currentUserID;
-    user.password = "12345";
-    users[currentUserID] = user;
+    response.writeHead(200, {"Content-Type": defaultHeader});
+    var user = userManager.addUser();
+    console.log(JSON.stringify(user));
     response.write(JSON.stringify(user));
     response.end();
-    currentUserID ++;
 }
 
 function randomGame(response, postData) {
     console.log("Request handler 'randomGame' was called.");
-    response.writeHead(200, {"Content-Type": "text/plain\nAccess-Control-Allow-Origin: *"});
+    response.writeHead(200, {"Content-Type": defaultHeader});
     console.log("Received post data: " + postData);
 
     var post = querystring.parse(postData);
     var receivedUser = JSON.parse(post.json);
-    if(waitingGame.length < 1) {
-        console.log("Waiting game was 0");
-
-        // TODO authenticate
-
-        var game = new Game();
-        game.p1user = users[receivedUser.userID];
-        game.gameID = currentGameID;
-
-        console.log("Made game with user " + game.p1user.password);
-        response.write(JSON.stringify(game));
-
-        games.push(game);
-
-        waitingGame.push(game);
-        currentGameID++;
-    } else {
-        var game = waitingGame[0];
-        console.log(game);
-        console.log("Adding user to game " + game.gameID);
-        game.p2user = users[receivedUser.userID];
-        response.write(JSON.stringify(game));
-        waitingGame.pop();
+    // TODO authenticate
+    var user = userManager.findUserByID(receivedUser.userID);
+    if(user === null) {
+        response.write("ERROR user not found");
+        response.end();
+        return;
     }
-
+    var game = gameManager.randomGame(user);
+    response.write(JSON.stringify(game));
     response.end();
 }
 
 function placeBoats(response, postData) {
     console.log("Request handler 'placeBoats' was called.");
-    response.writeHead(200, {"Content-Type": "text/plain\nAccess-Control-Allow-Origin: *"});
+    response.writeHead(200, {"Content-Type": defaultHeader});
     response.write("Return GameState!");
     response.end();
 }
 
 function placeBomb(response, postData) {
     console.log("Request handler 'placeBomb' was called.");
-    response.writeHead(200, {"Content-Type": "text/plain\nAccess-Control-Allow-Origin: *"});
+    response.writeHead(200, {"Content-Type": defaultHeader});
     response.write("Return GameState!");
     response.end();
 }
 
 function status(response, postData) {
     console.log("Request handler 'start' was called.");
-    response.writeHead(200, {"Content-Type": "text/plain\nAccess-Control-Allow-Origin: *"});
+    response.writeHead(200, {"Content-Type": defaultHeader});
     response.write("Users (test)\n\n");
     response.write(JSON.stringify(users) + "\n");
     response.write("Games\n\n");
     response.write(JSON.stringify(games) + "\n");
+    response.end();
+}
+
+function gameList(response, postData) {
+    console.log("Request handler 'gameList' was called.");
+    response.writeHead(200, {"Content-Type": defaultHeader});
+    console.log("Received post data: " + postData);
+
+    var post = querystring.parse(postData);
+    var receivedUser = JSON.parse(post.json);
+    var user = userManager.findUserByID(receivedUser.userID);
+    if(user === null) {
+        response.write("ERROR user not found");
+        response.end();
+        return;
+    }
+
+    var gamesToReturn = gameManager.gameList(user);
+    response.write(JSON.stringify(gamesToReturn));
+    console.log("Writing: " + JSON.stringify(gamesToReturn));
     response.end();
 }
 
@@ -86,3 +92,4 @@ exports.randomGame = randomGame;
 exports.placeBoats = placeBoats;
 exports.placeBomb = placeBomb;
 exports.status = status;
+exports.gameList = gameList;

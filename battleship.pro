@@ -17,4 +17,6 @@ OTHER_FILES += \
     communicator.js \
     index.html \
     mousehelper.js \
-    mainmenu.js
+    mainmenu.js \
+    server/gamemanager.js \
+    server/usermanager.js
