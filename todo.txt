@@ -1,8 +1,8 @@
-Clean up with classes in separate files.
-Clean up global variables.
+//Clean up with classes in separate files.
+//Clean up global variables.
 
-Initialisering av programmet
-Request new user / log in existing user
+//Initialisering av programmet
+//Request new user / log in existing user
 
 Request game list / refresh games timer
 Show list of games

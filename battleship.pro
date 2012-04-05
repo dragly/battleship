@@ -1,4 +1,5 @@
 OTHER_FILES += \
+    button.js \
     user.js \
     tile.js \
     main.js \
