@@ -3,13 +3,14 @@ function ButtonHandler() { //returns true if press was handled
     this.buttons = new Array();
 }
 ButtonHandler.prototype.addButton = function (width, height, x, y, text, event) {
-    var btn = new button(width, height, x, y, text, event);
+    var btn = new Button(width, height, x, y, text, event);
     this.buttons.push(btn);
     return btn;
 }
-ButtonHandler.prototype.mouseReleased = function (x, y) { //Has to be called every time the mouse is released, even if other handler catches the event
+ButtonHandler.prototype.mouseReleased = function (x, y) {
+            //Has to be called every time the mouse is released, even if other handler catches the event
     if (currentlyPressedButtonIndex != -1) {
-        var ret = buttons[currentlyPressedButtonIndex].keyRelease();
+        var ret = buttons[currentlyPressedButtonIndex].mouseReleased(x,y);
         currentlyPressedButtonIndex = -1;
         return ret;
     }
@@ -19,7 +20,7 @@ ButtonHandler.prototype.mousePressed = function (x, y) {
     for (var i = 0; i < this.buttons.length(); i++) {
         if (buttons[i].isWithinBounds(x, y)) {
             this.currentlyPressedButtonIndex = i;
-            buttons[i].pressKey();
+            buttons[i].mousePressed();
             return true;
         }
     }
@@ -42,10 +43,10 @@ function Button(width, height, x, y, text,event) {
 Button.prototype.isWithinBounds = function (x, y) {
     return (x > this.x && x < this.x + this.width && y > this.y && y < this.y + this.height);
 }
-Button.prototype.pressKey = function () {
+Button.prototype.mousePressed = function () {
     this.isDown = true;
 }
-Button.prototype.keyRelease = function () {
+Button.prototype.mouseReleased = function () {
     this.isDown = false;
 
     if (this.isWithinBounds(x, y)) {
