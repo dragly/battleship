@@ -1,3 +1,4 @@
+
 function ButtonHandler() { //returns true if press was handled
     this.currentlyPressedButtonIndex = -1;
     this.buttons = new Array();
@@ -25,6 +26,12 @@ ButtonHandler.prototype.mousePressed = function (x, y) {
         }
     }
     return false;
+}
+
+ButtonHandler.prototype.hideAll = function () {
+    for (var i = 0; i < this.buttons.length(); i++) {
+        this.buttons[i].isVisible = false;
+    }
 }
 
 function Button(width, height, x, y, text,event) {
@@ -55,6 +62,10 @@ Button.prototype.mouseReleased = function () {
     }
     return false;
 }
+Button.prototype.show() {
+    this.isVisible = true;
+}
+
 Button.prototype.draw = function () {
     ctx.fillStyle = "rgb(200,50,0)";
     ctx.fillRect(this.x, this.y, this.width, this.height);
