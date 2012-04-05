@@ -1,37 +1,14 @@
 var exec = require("child_process").exec;
 var querystring = require("querystring");
+var Game = require("./game").Game;
+var Boat = require("./boat").Boat;
+var User = require("./user").User;
 
 var currentUserID = 0;
 var currentGameID = 0;
 var users = new Array();
 var games = new Array();
 var waitingGame = new Array();
-
-function Boat() {
-    this.index = 0;
-}
-
-function User() {
-    this.userID = "";
-    this.username = "";
-    this.password = "";
-}
-
-function Game() {
-    this.gameID = "";
-    this.turn = 0;
-    this.currentPlayer = 0;
-    this.nRows = 8;
-    this.nCols = 8;
-    this.p1user = 0;
-    this.p2user = 0;
-    this.p1Boats = new Array();
-    this.p2Boats = new Array();
-    this.p1BoatMask = new Array();
-    this.p2BoatMask = new Array();
-    this.p1HitMask = new Array();
-    this.p2HitMask = new Array();
-}
 
 function newUser(response, postData) {
     console.log("Request handler 'newUser' was called.");
