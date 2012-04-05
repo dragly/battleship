@@ -1,6 +1,7 @@
 ﻿function main() {
-
+    console.log("Starting everything");
     var mainMenu = new MainMenu();
+    console.log("Initing application");
     mainMenu.initApplication();
     //    for(var i = 0; i < nRows * nCols; i++) {
     //        ourTiles[i] = new Tile(i);

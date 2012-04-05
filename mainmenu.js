@@ -3,8 +3,6 @@ var tileMargin = 10;
 var nRows = 8;
 var nCols = 8;
 var nBoats = 5;
-var ourTiles = new Array();
-var theirTiles = new Array();
 var ourBoats = new Array();
 var theirBoats = new Array();
 
@@ -38,6 +36,7 @@ function MainMenu() {
     this.ctx = 0;
     this.user = null;
     this.isDragging = -1;
+    this.currentGame = 0;
     //Buttons
     var self = this;
     this.buttonHandler = new ButtonHandler();
@@ -83,7 +82,10 @@ MainMenu.prototype.showLoginScreen = function () {
 }
 
 MainMenu.prototype.showGameList = function() {
-    this.menuState = MenuState.List;
+            this.requestGameList();
+            this.menuState = MenuState.List;
+            this.redraw();
+        }
 
     this.buttonHandler.hideAll();
 
@@ -96,52 +98,91 @@ MainMenu.prototype.requestNewUser = function() {
             this.communicator.requestNewUser(function(statusCode, user) {self.receivedNewUser(statusCode, user)});
 }
 MainMenu.prototype.receivedNewUser = function(statusCode, user) {
-    console.log("I was called back with status code " + statusCode);
-    if(statusCode === 408) {
-        console.log("Timed out requesting user...");
-    }
-    if(statusCode === 0) {
-        console.log("A new user was returned successfully!");
-        this.user = user;
-        console.log(this.isDragging);
-        this.showGameList();
-    }
-}
+            if(statusCode === 408) {
+                console.log("Timed out requesting user...");
+            } else if(statusCode === 0) {
+                console.log("A new user was returned successfully!");
+                this.user = user;
+                console.log(this.isDragging);
+                this.showGameList();
+            } else {
+                console.log("ERROR: Unknown status code " + statusCode);
+            }
+        }
+
+MainMenu.prototype.requestGameList = function() {
+            var self = this;
+            // TODO add this to the communicator class
+            this.communicator.requestGameList(this.user, function(statusCode, user) {self.receivedGameList(statusCode, user)});
+        }
+MainMenu.prototype.receivedGameList = function(statusCode, games) {
+            if(statusCode === 408) {
+                console.log("Timed out requesting gameList...");
+            } else if(statusCode === 0) {
+                console.log("A game list was returned successfully!");
+                this.games = games;
+                console.log("We now have " + this.games.length + " games available to play.")
+                this.redraw();
+            } else {
+                console.log("ERROR: Unknown status code " + statusCode);
+            }
+        }
+
 MainMenu.prototype.showGame = function(game) {
             // TODO implement this
             console.log("Not implemented");
-            currentGame = game;
+            this.currentGame = game;
             this.menuState = 1;
             this.redraw();
         }
 
 MainMenu.prototype.requestRandomGame = function() {
-            this.communicator.requestRandomGame(function(statusCode, game) {self.receivedRandomGame(statusCode, game);});
+            var self = this;
+            this.communicator.requestRandomGame(this.user, function(statusCode, game) {self.receivedRandomGame(statusCode, game);});
         }
 MainMenu.prototype.receivedRandomGame = function(statusCode, game) {
             console.log("Received game");
             games.push(game);
             this.showGame(game);
-}
+        }
 
 // *********** DRAWING STUFF *********** //
 
-MainMenu.prototype.redraw = function () {
-    console.log(this.menuState);
-    this.clear();
-    if (this.menuState === MenuState.Login) {
-        this.ctx.fillStyle = "rgb(0,0,0)";
-        this.ctx.fillText("Login screen", 100, 100);
-        //this.ctx.fillText("Click to create new user", 100, 200);
-    } else if (this.menuState === MenuState.List) {
-        // TODO Draw the list
-        this.ctx.fillStyle = "rgb(0,0,0)";
-        this.ctx.fillText("Game list", 100, 100);
-    } else if (this.menuState === MenuState.Ours) {
-        this.ctx.fillText("Mine", 10, 10);
-        // TODO Draw the board
-        for (var i = 0; i < nRows * nCols; i++) {
-            ourTiles[i].draw();
+MainMenu.prototype.redraw = function() {
+            this.clear();
+            if(this.menuState === MenuState.Login) {
+                this.ctx.fillStyle = "rgb(0,0,0)";
+                this.ctx.fillText("Login screen", 100, 100);
+                this.ctx.fillText("Click to create new user", 100, 200);
+            } else if(this.menuState === MenuState.List) {
+                // TODO Draw the list
+                this.ctx.fillStyle = "rgb(0,0,0)";
+                this.ctx.fillText("Game list", 100, 100);
+            } else if(this.menuState === MenuState.Ours) {
+                this.ctx.fillText("Mine",10,10);
+                // TODO Draw the board
+                for(var i = 0; i < this.currentGame.ourTiles.length; i++) {
+                    this.currentGame.ourTiles[i].draw();
+                }
+                for(var i = 0; i < this.currentGame.ourBoats; i++) {
+                    this.currentGame.ourBoats[i].draw();
+                }
+            } else if(this.menuState === MenuState.Theirs) {
+                this.ctx.fillText("Theirs",10,10);
+                for(var i = 0; i < this.currentGame.theirTiles.length; i++) {
+                    this.currentGame.theirTiles[i].draw();
+                }
+                // TODO draw hit boats
+                for(var i = 0; i < nBoats; i++) {
+                    //                        theirboats[i].draw();
+                }
+            } else {
+                console.log("WARNING: Unknown menu state!");
+            }
+
+            this.ctx.fillText("GameState: " + this.gameState, this.canvas.width - 100, 10);
+            this.ctx.fillStyle = "rgb(200,50,0)";
+            this.ctx.fillRect(100, this.canvas.height-150, 200, 50);
         }
         for (var i = 0; i < nBoats; i++) {
             ourBoats[i].draw();

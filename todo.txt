@@ -4,10 +4,11 @@
 //Initialisering av programmet
 //Request new user / log in existing user
 
-Request game list / refresh games timer
+//Request game list / refresh games timer
 Show list of games
 
-New random game via comm
+//New random game via comm
+Receive game data from server and show this on screen
 Place boats
 Wait for opponent / refreshing
 Request game data (also used for opening games which have updates)
