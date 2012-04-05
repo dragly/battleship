@@ -1,4 +1,4 @@
-var menuState = 0; // 0 - game menu, 1 - our table, 2 - their table
+﻿var menuState = 0; // 0 - game menu, 1 - our table, 2 - their table
 var gameState = 0; // 0 - place boats, 1 - waiting for opponent, 2 - your turn, 3 - their turn
 var canvas;
 var ctx;
@@ -53,7 +53,7 @@ function main() {
             //servOurTiles[i] = new Tile(i);
             //servTheirTiles[i] = new Tile(i);
         }
-        //TODO dette skjer for tidlig, m� flyttes
+        //TODO dette skjer for tidlig, må flyttes
         for(var i = 0; i < nBoats; i++) {
             switch(i) {
             case 0:
