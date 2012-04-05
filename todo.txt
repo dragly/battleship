@@ -1,0 +1,22 @@
+Clean up with classes in separate files.
+Clean up global variables.
+
+Initialisering av programmet
+Request new user / log in existing user
+
+Request game list / refresh games timer
+Show list of games
+
+New random game via comm
+Place boats
+Wait for opponent / refreshing
+Request game data (also used for opening games which have updates)
+Back button to menu
+Switch boards
+
+Place bombs one by one and receive hit information
+Waiting for opponent
+
+Close/reopen game
+
+Exponential polling time
