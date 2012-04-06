@@ -10,9 +10,9 @@ function Game() {
 }
 
 Game.prototype.compareMasks = function (mask1, mask2) {
-    var outMask = new Array();
-    for (var i = 0; i < mask1.length; i++) {
-        outMask[i] = mask1[i] & mask2[i];
-    }
-    return outMask;
+//    var outMask = new Array();
+//    for (var i = 0; i < mask1.length; i++) {
+//        outMask[i] = mask1[i] & mask2[i];
+//    }
+//    return outMask;
 }
