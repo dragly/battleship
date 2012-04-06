@@ -16,6 +16,10 @@ userManager = new UserManager();
 gameManager = new GameManager(userManager);
 
 function newUser(response, postData) {
+
+    //var test = JSON.parse(postData);
+    console.log("data: ");
+    console.log(querystring.parse(postData));
     console.log("Request handler 'newUser' was called.");
     response.writeHead(200, {"Content-Type": defaultHeader});
     var user = userManager.addUser();

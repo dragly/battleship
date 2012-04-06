@@ -15,7 +15,7 @@ function Game(nRows, nCols) {
     this.p1ShotMask = new Array();
     this.p2ShotMask = new Array();
 
-    for(i = 0; i < (nRows * nCols) / 32 ; i++) {
+    for (i = 0; i < (nRows * nCols) / 32; i++) {
         this.p1BoatMask.push(0);
         this.p2BoatMask.push(0);
         this.p1ShotMask.push(0);
@@ -23,13 +23,13 @@ function Game(nRows, nCols) {
     }
 }
 
-Game.prototype.hasUser = function(user) {
-            if(user.userID === this.p1user.userID || user.userID === this.p2user.userID) {
-                return true;
-            } else {
-                return false;
-            }
-        }
+Game.prototype.hasUser = function (user) {
+    if (user.userID === this.p1user.userID || user.userID === this.p2user.userID) {
+        return true;
+    } else {
+        return false;
+    }
+}
 
 Game.prototype.findDestroyedBoats = function(player) {
             var boats;
