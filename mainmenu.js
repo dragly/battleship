@@ -70,12 +70,14 @@ MainMenu.prototype.initApplication = function() {
         }
 
 MainMenu.prototype.showLoginScreen = function () {
+            $.mobile.hidePageLoadingMsg();
             this.menuState = MenuState.Login;
 
             this.buttonHandler.hideAll();
             this.newUserButton.show();
 
             this.redraw();
+            $.mobile.changePage("#loginPage");
         }
 
 MainMenu.prototype.showGameList = function() {
@@ -127,6 +129,10 @@ MainMenu.prototype.requestGameList = function() {
             $.mobile.showPageLoadingMsg("a","Loading game list...", false);
             var self = this;
             // TODO add this to the communicator class
+            if(this.user === null) {
+                this.showLoginScreen();
+                return;
+            }
             this.communicator.requestGameList(this.user, function(statusCode, user) {self.receivedGameList(statusCode, user)});
         }
 MainMenu.prototype.receivedGameList = function(statusCode, games) {
@@ -154,6 +160,11 @@ MainMenu.prototype.receivedGameList = function(statusCode, games) {
 MainMenu.prototype.requestRandomGame = function() {
             $.mobile.showPageLoadingMsg("a","Requesting a random game...", false);
             var self = this;
+            if(this.user === null) {
+                this.showLoginScreen();
+                return;
+            }
+
             this.communicator.requestRandomGame(this.user, function(statusCode, game) {self.receivedRandomGame(statusCode, game);});
         }
 MainMenu.prototype.receivedRandomGame = function(statusCode, game) {
@@ -166,6 +177,10 @@ MainMenu.prototype.receivedRandomGame = function(statusCode, game) {
 // *********** DRAWING STUFF *********** //
 
 MainMenu.prototype.redraw = function() {
+            // Set canvas to fullscreen (minus some UI stuff)
+            this.ctx.canvas.width  = window.innerWidth;
+            this.ctx.canvas.height = window.innerHeight - 200;
+
             this.clear();
 
             if(this.menuState === MenuState.Login) {
