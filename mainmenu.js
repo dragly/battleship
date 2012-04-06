@@ -92,18 +92,22 @@ MainMenu.prototype.showGameList = function() {
         }
 
 MainMenu.prototype.showGame = function (game) {
-            // TODO implement this
-            console.log("Showing game with ID " + game.gameID);
-            this.currentGame = game;
-            this.menuState = MenuState.Ours;
+    // TODO implement this
+    console.log("Showing game with ID " + game.gameID);
+    this.currentGame = game;
+    this.menuState = MenuState.Ours;
 
-            this.buttonHandler.hideAll();
-            this.goToGameListButton.show();
+    this.buttonHandler.hideAll();
+    this.goToGameListButton.show();
 
 
-            this.redraw();
-            $.mobile.changePage("#gamePage");
-        }
+    this.redraw();
+    $.mobile.changePage("#gamePage");
+}
+
+MainMenu.prototype.shootAtTile = function (index) {
+    
+}
 
 MainMenu.prototype.requestNewUser = function() {
             $.mobile.showPageLoadingMsg("a","Connecting to server...", false);
@@ -303,17 +307,17 @@ MainMenu.prototype.canvasMouseUp = function (e) {
         }
 
 MainMenu.prototype.canvasMouseDown = function (e) {
-            var mousePos = this.mouseHelper.getCursorPosition(e, this.canvas);
+    var mousePos = this.mouseHelper.getCursorPosition(e, this.canvas);
 
-            this.buttonHandler.mousePressed(mousePos.x, mousePos.y);
+    this.buttonHandler.mousePressed(mousePos.x, mousePos.y);
 
-            if (this.menuState === MenuState.Ours && this.gameState === GameState.PlaceBoats) {
-                console.log("spotted " + this.currentGame.ourBoats.length + "boats. With mouse coord: " + mousePos.x + "," + mousePos.y);
-                for (var i = 0; i < this.currentGame.ourBoats.length; i++) {
-                    if (this.currentGame.ourBoats[i].isClicked(mousePos.x, mousePos.y)) {
-                        console.log("boat clicked!!");
-                        this.isDragging = i;
-                    }
-                }
+    if (this.menuState === MenuState.Ours && this.gameState === GameState.PlaceBoats) {
+        console.log("spotted " + this.currentGame.ourBoats.length + "boats. With mouse coord: " + mousePos.x + "," + mousePos.y);
+        for (var i = 0; i < this.currentGame.ourBoats.length; i++) {
+            if (this.currentGame.ourBoats[i].isClicked(mousePos.x, mousePos.y)) {
+                console.log("boat clicked!!");
+                this.isDragging = i;
             }
         }
+    }
+}
