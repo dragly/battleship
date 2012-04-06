@@ -22,7 +22,7 @@ Communicator.prototype.ajaxCall = function(url,callback, data) {
     $.ajax({
         type: "POST",
         url: url,
-        data: data,
+        data: JSON.stringify(data),
         timeout: 5000,
         success: function(response) { callback(response); },
         error: function (request, status, err) { self.errorHandler(request,status,err); },
@@ -74,14 +74,23 @@ Communicator.prototype.receivedRandomGame = function (gameData, callback) {
     callback( game);
 }
 
-Communicator.prototype.requestGameList = function (user, callback) {
+Communicator.prototype.requestGameList = function (user, games, callback) {
     var self = this;
-    console.log("Requesting game list");
-    var params = {user: user.authData()};
+    console.log("Requesting game list by sending " + games.length + " games");
+    var gamesToRequests = new Array();
+    for(var i = 0; i < games.length; i++) {
+        var game = games[i];
+        gamesToRequests.push({
+                                 turn: game.turn,
+                                 gameID: game.gameID
+                             });
+    }
+    console.log("Requesting " + gamesToRequests.length + " games")
+    var params = {user: user.authData(), games: gamesToRequests};
     this.ajaxCall("http://" + this.serverUrl + "/gameList", function (response) { self.receivedGameList(response, callback); },params);
 }
 
-Communicator.prototype.receivedGameList = function (gameData, callback) {
+Communicator.prototype.receivedGameList = function (gamesData, callback) {
     console.log("Received game list!");
     var games = new Array();
     for (var i = 0; i < gamesData.length; i++) {

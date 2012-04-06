@@ -23,7 +23,7 @@ GameManager.prototype.addGame = function(user) {
 GameManager.prototype.randomGame = function(user) {
             var game;
             if(this.waitingGame.length < 1 || this.waitingGame[0].hasUser(user)) {
-                console.log("Waiting game was empty or contained user already. Creating new random game.");
+                console.log("Waiting game was empty or contained user " + user.userID + " already. Creating new random game.");
                 game = this.addGame(user);
                 this.waitingGame.push(game);
             } else {

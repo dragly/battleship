@@ -36,6 +36,6 @@ MaskHelper.compare = function(mask1, mask2) {
             return isEqual;
         }
 
-if(exports !== undefined) {
+if(typeof exports != 'undefined') {
     exports.MaskHelper = MaskHelper;
 }

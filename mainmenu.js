@@ -197,10 +197,10 @@ MainMenu.prototype.requestRandomGame = function () {
         return;
     }
 
-    this.communicator.requestRandomGame(this.user, function (statusCode, game) { self.receivedRandomGame(statusCode, game); });
+    this.communicator.requestRandomGame(this.user, function (game) { self.receivedRandomGame(game); });
 }
 
-MainMenu.prototype.receivedRandomGame = function (statusCode, game) {
+MainMenu.prototype.receivedRandomGame = function (game) {
     this.hideLoadingMessage();
     console.log("Received game");
     this.gameList.addGames([game]);
