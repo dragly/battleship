@@ -29,7 +29,7 @@ GameManager.prototype.randomGame = function(user) {
             } else {
                 game = this.waitingGame[0];
                 console.log("Adding user to game " + game.gameID);
-                game.players[2].userID = user;
+                game.players[1].userID = user;
                 this.waitingGame.pop();
             }
             return game;
@@ -97,15 +97,15 @@ GameManager.prototype.convertGameToGameData = function(user, game) {
                 ourboatMask = game.players[0].boatMask;
                 ourshotMask = game.players[0].shotMask;
 
-                opponent = game.players[2].userID;
+                opponent = game.players[1].userID;
                 theirboats = game.findDestroyedboats(2);
-                theirboatMask = game.players[2].boatMask;
-                theirshotMask = game.players[2].shotMask;
+                theirboatMask = game.players[1].boatMask;
+                theirshotMask = game.players[1].shotMask;
             } else {
                 // we are user 2
-                ourboats = game.players[2].boats;
-                ourboatMask = game.players[2].boatMask;
-                ourshotMask = game.players[2].shotMask;
+                ourboats = game.players[1].boats;
+                ourboatMask = game.players[1].boatMask;
+                ourshotMask = game.players[1].shotMask;
 
                 opponent = game.players[0].userID;
                 theirboats = game.findDestroyedboats(1);
