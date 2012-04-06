@@ -1,10 +1,10 @@
 var MaskHelper = require("../shared/maskhelper.js").MaskHelper;
 
 function GameUserData() {
-    user = 0;
-    boats = new Array();
-    boatMask = new Array();
-    shotMask = new Array();
+    this.user = 0;
+    this.boats = new Array();
+    this.boatMask = new Array();
+    this.shotMask = new Array();
 }
 
 function Game(nRows, nCols) {
