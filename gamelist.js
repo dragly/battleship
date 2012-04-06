@@ -6,6 +6,7 @@ function GameList(mainMenu) {
 
 GameList.prototype.addGames = function(receivedGames) {
             console.log("Trying to add " + receivedGames.length + " new games")
+            console.log(receivedGames);
             for(var j = 0; j < receivedGames.length; j++) {
                 var hadGameAlready = false;
                 for(var i = 0; i < this.games.length; i++) {

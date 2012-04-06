@@ -42,10 +42,6 @@ function MainMenu() {
     this.newRandomGameButton = new Button(this.buttonHandler, 100, 400, 200, 50, "New Random Game", function () { self.requestRandomGame() });
     this.goToGameListButton = new Button(this.buttonHandler, 100, 500, 200, 50, "Exit to Game List", function () { self.showGameList() });
 
-    // Catch all errors
-    $(document).ajaxError(function () {
-        self.httpError();
-    })
     // Set up JQuery mobile
     $(document).bind("mobileinit", function () {
         $.extend($.mobile, {
@@ -58,7 +54,7 @@ function MainMenu() {
 MainMenu.prototype.httpError = function () {
     this.hideLoadingMessage();
     console.log("Received HTTP error!");
-    this.communicator.stopAll();
+//    this.communicator.stopAll();
     alert("Could not connect to the game server. Please try again later.");
 }
 
@@ -159,6 +155,7 @@ MainMenu.prototype.recievedShootAtTile = function (success, index, boat, newBoat
         return;
 
     MaskHelper.setIndex(game.theirShotMask, index);
+}
 
     if (boat)
         MaskHelper.setIndex(game.theirBoatMask, index);
@@ -211,10 +208,10 @@ MainMenu.prototype.requestRandomGame = function () {
         return;
     }
 
-    this.communicator.requestRandomGame(this.user, function (statusCode, game) { self.receivedRandomGame(statusCode, game); });
+    this.communicator.requestRandomGame(this.user, function (game) { self.receivedRandomGame(game); });
 }
 
-MainMenu.prototype.receivedRandomGame = function (statusCode, game) {
+MainMenu.prototype.receivedRandomGame = function (game) {
     this.hideLoadingMessage();
     console.log("Received game");
     this.gameList.addGames([game]);

@@ -65,10 +65,13 @@ function randomGame(response, postData) {
     response.writeHead(200, {"Content-Type": defaultHeader});
     console.log("Received post data: " + postData);
 
-    var post = querystring.parse(postData);
-    var receivedUser = JSON.parse(post.json);
+    //var post = querystring.parse(postData);
+    var receivedData = JSON.parse(postData);
+    var receivedUser = receivedData.user;
     // TODO authenticate
+    console.log("Looking up user with ID " + receivedUser.userID);
     var user = userManager.findUserByID(receivedUser.userID);
+    console.log("Found user with ID " + user.userID);
     if(user === null) {
         response.write("ERROR user not found");
         response.end();
@@ -112,8 +115,7 @@ function gameList(response, postData) {
     response.writeHead(200, {"Content-Type": defaultHeader});
     console.log("Received post data: " + postData);
 
-    var post = querystring.parse(postData);
-    var receivedJson = JSON.parse(post.json);
+    var receivedJson = JSON.parse(postData);
     var user = userManager.findUserByID(receivedJson.user.userID);
     if(user === null) {
         response.write("ERROR user not found");

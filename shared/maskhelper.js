@@ -48,4 +48,6 @@ MaskHelper.getValueOfIndex = function (mask, TileIndex) {
     return ((mask(i) & 0x1 << nBIt) != 0);
 }
 
-exports.MaskHelper = MaskHelper;
+if(typeof exports != 'undefined') {
+    exports.MaskHelper = MaskHelper;
+}

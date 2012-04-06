@@ -9,7 +9,8 @@ Communicator.prototype.errorHandler = function(request,status,err) {
         console.log("ERROR 408: Request timed out!");
     } else {
         console.log(status);
-    }     
+    }
+    mainMenu.httpError();
     //if ( status == "error" ) {
     //} else if ( status == "abort" ) {
     //}
@@ -21,7 +22,7 @@ Communicator.prototype.ajaxCall = function(url,callback, data) {
     $.ajax({
         type: "POST",
         url: url,
-        data: data,
+        data: JSON.stringify(data),
         timeout: 5000,
         success: function(response) { callback(response); },
         error: function (request, status, err) { self.errorHandler(request,status,err); },
@@ -49,16 +50,17 @@ Communicator.prototype.recievedShootTile = function (gameData, callback) {
     callback(gameData.success,gameData.index,gameData.boat, gameData.newBoatSunk);
 }
 
+
 Communicator.prototype.requestShootTile = function (user, game, index, callback) {
     var self = this;
-    var params = { user: user.userID, key: user.key, gameID: game.gameID, tile: index };
+            var params = { user: user.authData(), gameID: game.gameID, tile: index };
     this.ajaxCall("http://" + this.serverUrl + "/shoot", function (response) { self.receivedShootTile(response, callback); }, params);
 }
 
 Communicator.prototype.requestRandomGame = function (user, callback) {
     var self = this;
     console.log("Requesting random game");
-    var params = "json=" + JSON.stringify(user);
+    var params = {user: user.authData()};
     this.ajaxCall("http://" + this.serverUrl + "/randomGame", function (response) { self.receivedRandomGame(response, callback); }, params);
 }
 
@@ -72,14 +74,23 @@ Communicator.prototype.receivedRandomGame = function (gameData, callback) {
     callback( game);
 }
 
-Communicator.prototype.requestGameList = function (user, callback) {
+Communicator.prototype.requestGameList = function (user, games, callback) {
     var self = this;
-    console.log("Requesting game list");
-    var params = "json=" + JSON.stringify(user);
+    console.log("Requesting game list by sending " + games.length + " games");
+    var gamesToRequests = new Array();
+    for(var i = 0; i < games.length; i++) {
+        var game = games[i];
+        gamesToRequests.push({
+                                 turn: game.turn,
+                                 gameID: game.gameID
+                             });
+    }
+    console.log("Requesting " + gamesToRequests.length + " games")
+    var params = {user: user.authData(), games: gamesToRequests};
     this.ajaxCall("http://" + this.serverUrl + "/gameList", function (response) { self.receivedGameList(response, callback); },params);
 }
 
-Communicator.prototype.receivedGameList = function (gameData, callback) {
+Communicator.prototype.receivedGameList = function (gamesData, callback) {
     console.log("Received game list!");
     var games = new Array();
     for (var i = 0; i < gamesData.length; i++) {
