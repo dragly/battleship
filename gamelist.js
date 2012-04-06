@@ -40,18 +40,25 @@ GameList.prototype.refresh = function() {
 GameList.prototype.createGameFromData = function(gameData) {
             var game = new Game();
             game.gameID = gameData.gameID;
-            var opponent = new User();
             var opponentData = gameData.opponent;
-            if(opponentData !== null) {
-                opponent.userID = opponentData.userID;
-                opponent.username = opponentData.username;
-
+            if(gameData.opponent !== null) {
+                var opponent = new User();
+                ObjectHelper.copyDataToObject(gameData.opponent, opponent, ["userID", "username"]);
                 game.opponent = opponent;
             } else {
                 game.opponent = null;
             }
-
-            // TODO receive data about boats and such
-
+            for(var i = 0; i < gameData.ourBoats.length; i++) {
+                var boat = new Boat();
+                ObjectHelper.copyDataToObject(gameData.ourBoats, boat, ["index", "horizontal", "size"]);
+                game.ourBoats.push(boat);
+            }
+            for(var i = 0; i < gameData.theirBoats.length; i++) {
+                var boat = new Boat();
+                ObjectHelper.copyDataToObject(gameData.ourBoats, boat, ["index", "horizontal", "size"]);
+                game.theirBoats.push(boat);
+            }
+            ObjectHelper.copyDataToObject(gameData, game, ["ourBoatMask","ourShotMask","theirBoatMask","theirShotMask"]);
+            
             return game;
         }
