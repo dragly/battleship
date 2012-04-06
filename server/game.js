@@ -16,8 +16,8 @@ function Game(nRows, nCols) {
     this.user = new Array();
     
     this.players = new Array();
-    this.players[0] = new GamerUserData();    
-    this.players[1] = new GamerUserData();    
+    this.players[0] = new GameUserData();    
+    this.players[1] = new GameUserData();    
 
 
     for (i = 0; i < (nRows * nCols) / 32; i++) {
