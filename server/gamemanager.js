@@ -98,7 +98,7 @@ GameManager.prototype.convertGameToGameData = function(user, game) {
                 ourShotMask = game.p1ShotMask;
 
                 opponent = game.p2user;
-                theirBoats = game.findHitBoats(2);
+                theirBoats = game.findDestroyedBoats(2);
                 theirBoatMask = game.p2BoatMask;
                 theirShotMask = game.p2ShotMask;
             } else {
@@ -108,7 +108,7 @@ GameManager.prototype.convertGameToGameData = function(user, game) {
                 ourShotMask = game.p2ShotMask;
 
                 opponent = game.p1user;
-                theirBoats = game.findHitBoats(1);
+                theirBoats = game.findDestroyedBoats(1);
                 theirBoatMask = game.p1BoatMask;
                 theirShotMask = game.p1ShotMask;
             }

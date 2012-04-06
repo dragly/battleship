@@ -35,10 +35,10 @@ Game.prototype.findDestroyedBoats = function(player) {
             var boats;
             var shotMask;
             if(player === 1) {
-                boats = this.p1boats;
+                boats = this.p1Boats;
                 shotMask = this.p1ShotMask;
             } else {
-                boats = this.p2boats;
+                boats = this.p2Boats;
                 shotMask = this.p2ShotMask;
             }
             var hitBoats = new Array();
