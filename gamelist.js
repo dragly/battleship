@@ -10,16 +10,16 @@ GameList.prototype.addGames = function(receivedGames) {
             for(var j = 0; j < receivedGames.length; j++) {
                 var hadGameAlready = false;
                 for(var i = 0; i < this.games.length; i++) {
-                    console.log("Comparing local game " + this.games[i].gameID + " with remote " + receivedGames[j]);
+                    console.log("Comparing local game " + this.games[i].gameID + " with remote " + receivedGames[j].gameID);
                     if(this.games[i].gameID === receivedGames[j].gameID) {
                         console.log("We had this game already, updating");
-                        this.games[i] = this.createGameFromData(receivedGames[j]);
+                        this.games[i] = Game.createGameFromData(receivedGames[j]);
                         hadGameAlready = true;
                     }
                 }
                 if(!hadGameAlready) {
                     console.log("Appending a game");
-                    this.games.push(this.createGameFromData(receivedGames[j]));
+                    this.games.push(Game.createGameFromData(receivedGames[j]));
                 }
             }
 
@@ -36,29 +36,4 @@ GameList.prototype.refresh = function() {
             $("#gameList").listview("refresh"); // This line now updates the listview
         }
 
-// Create a game based on game data from server
-GameList.prototype.createGameFromData = function(gameData) {
-            var game = new Game();
-            game.gameID = gameData.gameID;
-            var opponentData = gameData.opponent;
-            if(gameData.opponent !== null) {
-                var opponent = new User();
-                ObjectHelper.copyDataToObject(gameData.opponent, opponent, ["userID", "username"]);
-                game.opponent = opponent;
-            } else {
-                game.opponent = null;
-            }
-            for(var i = 0; i < gameData.ourBoats.length; i++) {
-                var boat = new Boat();
-                ObjectHelper.copyDataToObject(gameData.ourBoats, boat, ["index", "horizontal", "size"]);
-                game.ourBoats.push(boat);
-            }
-            for(var i = 0; i < gameData.theirBoats.length; i++) {
-                var boat = new Boat();
-                ObjectHelper.copyDataToObject(gameData.ourBoats, boat, ["index", "horizontal", "size"]);
-                game.theirBoats.push(boat);
-            }
-            ObjectHelper.copyDataToObject(gameData, game, ["ourBoatMask","ourShotMask","theirBoatMask","theirShotMask"]);
-            
-            return game;
-        }
+

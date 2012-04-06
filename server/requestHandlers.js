@@ -78,7 +78,7 @@ function randomGame(response, postData) {
         return;
     }
     var game = gameManager.randomGame(user);
-    var gameData = gameManager.convertGameToGameData(user, game);
+    var gameData = Game.convertGameToGameData(user, game);
     console.log("Writing random game: " + JSON.stringify(gameData));
     response.write(JSON.stringify(gameData));
     response.end();
@@ -126,13 +126,13 @@ function gameList(response, postData) {
     var gamesToReturnLite = new Array();
     for(var i = 0; i < gamesToReturn.length; i++) {
         var game = gamesToReturn[i];
-        var gameData = gameManager.convertGameToGameData(user, game);
+        var gameData = Game.convertGameToGameData(user, game);
         // TODO Send data about boats and tiles
         gamesToReturnLite.push(gameData);
     }
 
     response.write(JSON.stringify(gamesToReturnLite));
-    console.log("Writing: " + JSON.stringify(gamesToReturnLite));
+    console.log("Writing gameList: " + JSON.stringify(gamesToReturnLite));
     response.end();
 }
 

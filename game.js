@@ -13,3 +13,29 @@ function Game() {
     this.opponent = null;
 }
 
+// Create a game based on game data from server
+Game.createGameFromData = function(gameData) {
+    var game = new Game();
+    game.gameID = gameData.gameID;
+    var opponentData = gameData.opponent;
+    if(gameData.opponent !== null) {
+        var opponent = new User();
+        ObjectHelper.copyDataToObject(gameData.opponent, opponent, ["userID", "username"]);
+        game.opponent = opponent;
+    } else {
+        game.opponent = null;
+    }
+    for(var i = 0; i < gameData.ourBoats.length; i++) {
+        var boat = new Boat();
+        ObjectHelper.copyDataToObject(gameData.ourBoats, boat, ["index", "horizontal", "size"]);
+        game.ourBoats.push(boat);
+    }
+    for(var i = 0; i < gameData.theirBoats.length; i++) {
+        var boat = new Boat();
+        ObjectHelper.copyDataToObject(gameData.ourBoats, boat, ["index", "horizontal", "size"]);
+        game.theirBoats.push(boat);
+    }
+    ObjectHelper.copyDataToObject(gameData, game, ["ourBoatMask","ourShotMask","theirBoatMask","theirShotMask"]);
+    
+    return game;
+}

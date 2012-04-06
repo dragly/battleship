@@ -85,18 +85,17 @@ Communicator.prototype.requestGameList = function (user, games, callback) {
                                  gameID: game.gameID
                              });
     }
-    console.log("Requesting " + gamesToRequests.length + " games")
     var params = {user: user.authData(), games: gamesToRequests};
     this.ajaxCall("http://" + this.serverUrl + "/gameList", function (response) { self.receivedGameList(response, callback); },params);
 }
 
 Communicator.prototype.receivedGameList = function (gamesData, callback) {
-    console.log("Received game list!");
+    console.log("Received game list! " + gamesData);
     var games = new Array();
     for (var i = 0; i < gamesData.length; i++) {
         var gameData = gamesData[i];
-        var game = new Game();
-        game.gameID = gameData.gameID;
+        var game = Game.createGameFromData(gameData);
+        console.log("Pushing game with ID " + game.gameID);
         games.push(game);
     }
     // TODO Add error handling if no game received or we have timed out
