@@ -10,7 +10,7 @@ function GameManager(userManager) {
 
 GameManager.prototype.addGame = function(user) {
             var game = new Game(8, 8);
-            game.players[0].userID = user;
+            game.players[0].user = user;
             game.gameID = this.currentGameID;
 
             console.log("Made game with user " + game.players[0].user.userID);
