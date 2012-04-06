@@ -9,7 +9,8 @@ Communicator.prototype.errorHandler = function(request,status,err) {
         console.log("ERROR 408: Request timed out!");
     } else {
         console.log(status);
-    }     
+    }
+    mainMenu.httpError();
     //if ( status == "error" ) {
     //} else if ( status == "abort" ) {
     //}
@@ -23,7 +24,7 @@ Communicator.prototype.ajaxCall = function(url,callback, data) {
         url: url,
         data: data,
         timeout: 5000,
-        success: function(responseText) { callback(response); },
+        success: function(response) { callback(response); },
         error: function (request, status, err) { self.errorHandler(request,status,err); },
         dataType: "json"
     });
@@ -52,7 +53,6 @@ Communicator.prototype.requestShootTile = function (user,game,index,callback) {
     var self = this;
     var params = "json=" + JSON.stringify(user);
     this.ajaxCall("http://" + this.serverUrl + "/shoot", params, function (responseText) { self.receivedShootTile(responseText, callback); });
-
 }
 
 
