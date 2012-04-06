@@ -11,7 +11,7 @@ Communicator.prototype.requestNewUser = function(callback) {
             this.receivedUserCallback = callback;
             $.post("http://" + this.serverUrl + "/newUser", "", function(responseText) { self.receivedNewUser(responseText, callback); });
             // time out after x seconds
-            this.requestUserTimeout = setTimeout(function() {this.receivedNewUser("timeout")}, this.defaultTimeout);
+            this.requestUserTimeout = setTimeout(function() {self.receivedNewUser("timeout", callback)}, this.defaultTimeout);
         }
 
 Communicator.prototype.receivedNewUser = function(responseText, callback) {
