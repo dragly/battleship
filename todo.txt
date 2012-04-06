@@ -18,6 +18,8 @@ Switch boards
 Place bombs one by one and receive hit information
 Waiting for opponent
 
-Close/reopen game
+//Close/reopen game
 
 Exponential polling time
+
+Forfeiting game

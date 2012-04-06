@@ -24,6 +24,7 @@ var MenuState = {
 function MainMenu() {
     this.mouseHelper = new MouseHelper();
     this.communicator = new Communicator();
+    this.gameList = new GameList();
     this.communicator.serverUrl = "localhost:8888";
     this.menuState = MenuState.Login; // 0 - game menu, 1 - our table, 2 - their table, 3 - login user
     this.gameState = GameState.PlaceBoats; // 0 - place boats, 1 - waiting for opponent, 2 - your turn, 3 - their turn
@@ -40,7 +41,29 @@ function MainMenu() {
     this.newUserButton =       new Button(this.buttonHandler, 100, 300, 200, 50, "Create new user", function () { self.requestNewUser() }); // <3 jallascript
     this.newRandomGameButton = new Button(this.buttonHandler, 100, 400, 200, 50, "New Random Game", function () { self.requestRandomGame() });
     this.goToGameListButton =  new Button(this.buttonHandler, 100, 500, 200, 50, "Exit to Game List",function () { self.showGameList() });
+
+    // Catch all errors
+    $(document).ajaxError(function() {
+                              self.httpError();
+                })
 }
+
+MainMenu.prototype.httpError = function() {
+            this.hideLoadingMessage();
+            console.log("Received HTTP error!");
+            this.communicator.stopAll();
+            alert("Could not connect to the game server. Please try again later.");
+}
+
+MainMenu.prototype.hideLoadingMessage = function() {
+            $.mobile.hidePageLoadingMsg();
+        }
+
+MainMenu.prototype.showLoadingMessage = function(message) {
+            $.mobile.loadingMessage = message;
+            $.mobile.showPageLoadingMsg("a",message, false);
+        }
+
 MainMenu.prototype.clear = function() {
             this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height);
         }
@@ -70,7 +93,7 @@ MainMenu.prototype.initApplication = function() {
         }
 
 MainMenu.prototype.showLoginScreen = function () {
-            $.mobile.hidePageLoadingMsg();
+            this.hideLoadingMessage();
             this.menuState = MenuState.Login;
 
             this.buttonHandler.hideAll();
@@ -91,6 +114,17 @@ MainMenu.prototype.showGameList = function() {
             $.mobile.changePage("#gameListPage");
         }
 
+MainMenu.prototype.showGameByID = function(gameID) {
+            for(var i = 0; i < this.gameList.games.length; i++) {
+                var game = this.gameList.games[i];
+                console.log("Comparing " + game.gameID + " with " + gameID);
+                if(game.gameID === gameID) {
+                    this.showGame(game);
+                    return;
+                }
+            }
+        }
+
 MainMenu.prototype.showGame = function (game) {
             // TODO implement this
             console.log("Showing game with ID " + game.gameID);
@@ -106,13 +140,13 @@ MainMenu.prototype.showGame = function (game) {
         }
 
 MainMenu.prototype.requestNewUser = function() {
-            $.mobile.showPageLoadingMsg("a","Connecting to server...", false);
+            this.showLoadingMessage("Connecting to server...");
             var self = this;
             // TODO add this to the communicator class
             this.communicator.requestNewUser(function(statusCode, user) {self.receivedNewUser(statusCode, user)});
         }
 MainMenu.prototype.receivedNewUser = function(statusCode, user) {
-            $.mobile.hidePageLoadingMsg();
+            this.hideLoadingMessage();
             if(statusCode === 408) {
                 console.log("Timed out requesting user...");
             } else if(statusCode === 0) {
@@ -126,7 +160,7 @@ MainMenu.prototype.receivedNewUser = function(statusCode, user) {
         }
 
 MainMenu.prototype.requestGameList = function() {
-            $.mobile.showPageLoadingMsg("a","Loading game list...", false);
+            this.showLoadingMessage("Loading game list...");
             var self = this;
             // TODO add this to the communicator class
             if(this.user === null) {
@@ -135,22 +169,14 @@ MainMenu.prototype.requestGameList = function() {
             }
             this.communicator.requestGameList(this.user, function(statusCode, user) {self.receivedGameList(statusCode, user)});
         }
+
 MainMenu.prototype.receivedGameList = function(statusCode, games) {
-            $.mobile.hidePageLoadingMsg();
+            this.hideLoadingMessage();
             if(statusCode === 408) {
                 console.log("Timed out requesting gameList...");
             } else if(statusCode === 0) {
                 console.log("A game list was returned successfully!");
-                this.games = games;
-                console.log("We now have " + this.games.length + " games available to play.")
-                $("#gameList").empty();
-                for(var i = 0; i < games.length; i++) {
-                    $("<li></li>")
-                          .text("Testing")
-                          .appendTo($("#gameList"));
-                }
-                $("#gameList").listview("refresh"); // This line now updates the listview
-
+                this.gameList.setGames(games);
                 this.redraw();
             } else {
                 console.log("ERROR: Unknown status code " + statusCode);
@@ -158,7 +184,7 @@ MainMenu.prototype.receivedGameList = function(statusCode, games) {
         }
 
 MainMenu.prototype.requestRandomGame = function() {
-            $.mobile.showPageLoadingMsg("a","Requesting a random game...", false);
+            this.showLoadingMessage("Requesting a random game...");
             var self = this;
             if(this.user === null) {
                 this.showLoginScreen();
@@ -167,8 +193,9 @@ MainMenu.prototype.requestRandomGame = function() {
 
             this.communicator.requestRandomGame(this.user, function(statusCode, game) {self.receivedRandomGame(statusCode, game);});
         }
+
 MainMenu.prototype.receivedRandomGame = function(statusCode, game) {
-            $.mobile.hidePageLoadingMsg();
+            this.hideLoadingMessage();
             console.log("Received game");
             games.push(game);
             this.showGame(game);
@@ -216,8 +243,12 @@ MainMenu.prototype.redraw = function() {
             this.buttonHandler.draw(this.ctx);
 
             this.ctx.fillText("GameState: " + this.gameState, this.canvas.width - 100, 10);
+
             //this.ctx.fillStyle = "rgb(200,50,0)";
             //this.ctx.fillRect(100, this.canvas.height - 150, 200, 50);
+
+            // Refresh the list of games
+//            this.gameList.refresh();
         }
 
 

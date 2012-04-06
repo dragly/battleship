@@ -82,8 +82,45 @@ function gameList(response, postData) {
     }
 
     var gamesToReturn = gameManager.gameList(user);
-    response.write(JSON.stringify(gamesToReturn));
-    console.log("Writing: " + JSON.stringify(gamesToReturn));
+    var gamesToReturnLite = new Array();
+    for(var i = 0; i < gamesToReturn.length; i++) {
+        var game = gamesToReturn[i];
+        gamesToReturnLite.push({
+                                   turn: game.turn,
+                                   gameID: game.gameID
+                               });
+    }
+
+    response.write(JSON.stringify(gamesToReturnLite));
+    console.log("Writing: " + JSON.stringify(gamesToReturnLite));
+    response.end();
+}
+
+function game(response, postData) {
+    console.log("Request handler 'game' was called.");
+    response.writeHead(200, {"Content-Type": defaultHeader});
+    console.log("Received post data: " + postData);
+
+    var post = querystring.parse(postData);
+    var receivedJson = JSON.parse(post.json);
+    // TODO Authenticate
+    var user = userManager.findUserByID(receivedJson.user.userID);
+    var game = gameManager.findGameByID(receivedJson.game.gameID);
+
+    // TODO Proper error handling
+    if(user === null) {
+        response.write("ERROR user not found");
+        response.end();
+        return;
+    }
+    if(game === null) {
+        response.write("ERROR game not found");
+        response.end();
+        return;
+    }
+
+    response.write(JSON.stringify(game));
+    console.log("Writing: " + JSON.stringify(gamesToReturnLite));
     response.end();
 }
 
@@ -93,3 +130,4 @@ exports.placeBoats = placeBoats;
 exports.placeBomb = placeBomb;
 exports.status = status;
 exports.gameList = gameList;
+exports.game = game;

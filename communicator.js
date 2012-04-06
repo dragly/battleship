@@ -3,8 +3,15 @@ function Communicator() {
     this.receivedUserCallback = 0;
     this.receivedRandomGameCallback = 0;
     this.defaultTimeout = 10000;
-    this.requestUserTimeout = 0;
+    this.requestUserTimeout = null;
 }
+
+// Stops all communication and timeouts
+Communicator.prototype.stopAll = function() {
+            // clear all timeouts
+            clearTimeout(this.requestUserTimeout);
+            // TODO any way to stop other communication? (not critical)
+        }
 
 Communicator.prototype.requestNewUser = function(callback) {
             var self = this;

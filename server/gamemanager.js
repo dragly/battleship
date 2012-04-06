@@ -46,4 +46,14 @@ GameManager.prototype.gameList = function(user) {
             return gamesToReturn;
         }
 
+GameManager.prototype.findGameByID = function(gameID) {
+            for(var i = 0; i < this.games.length; i++) {
+                var game = this.games[i];
+                if(game.gameID === gameID) {
+                    return game;
+                }
+            }
+            return null;
+        }
+
 exports.GameManager = GameManager;
