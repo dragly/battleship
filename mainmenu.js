@@ -146,30 +146,33 @@ MainMenu.prototype.showGame = function (game) {
 }
 
 MainMenu.prototype.requestShootAtTile = function (index) {
+    this.showLoadingMessage("Fire in ze hole!"); //"bombs away!", "missle on route!"
     //check selected tile, check ammo
     //Check if we're allowed to shoot at the tile? //show an error dialog
     this.communicator.requestShootTile(this.currentGame, index);
 }
-MainMenu.prototype.errorHandler = function (statusCode) {
-    if (statusCode === 408) {
-        console.log("Timed out requesting user...");
-    } else {
-        console.log("ERROR: Unknown status code " + statusCode);
-    }
+
+MainMenu.prototype.recievedShootAtTile = function (success, index, boat, newBoatSunk)  {
+    this.hideLoadingMessage();
+
+    if (!success)
+        return;
+
+    theirBoats.index
 }
 
-MainMenu.prototype.recievedShootAtTile = function (statusCode, index, hit) {
-    this.hideLoadingMessage();
-    if (statusCode === 408) {
-        console.log("Timed out requesting user...");
-    } else if (statusCode === 0) {
-        console.log("A new user was returned successfully!");
-        this.user = user;
-        console.log(this.isDragging);
-        this.showGameList();
-    } else {
-        console.log("ERROR: Unknown status code " + statusCode);
-    }   
+
+
+
+
+
+
+    //TODO: remove one ammo or complete turn if we're out of ammo
+
+
+    this.hideLoadingMessage(); gameData.success, gameData.index, gameData.boat
+    this.showGameList();
+          
 }
 
 MainMenu.prototype.requestNewUser = function () {

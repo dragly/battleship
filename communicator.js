@@ -46,7 +46,7 @@ Communicator.prototype.receivedNewUser = function (receivedUserData, callback) {
 
 Communicator.prototype.recievedShootTile = function (gameData, callback) {
     var self = this;
-    callback(gameData.success,gameData.index,gameData.boat);
+    callback(gameData.success,gameData.index,gameData.boat, gameData.newBoatSunk);
 }
 
 Communicator.prototype.requestShootTile = function (user, game, index, callback) {
