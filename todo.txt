@@ -5,7 +5,7 @@
 //Request new user / log in existing user
 
 //Request game list / refresh games timer
-Show list of games
+//Show list of games
 
 //New random game via comm
 Receive game data from server and show this on screen
@@ -18,6 +18,8 @@ Switch boards
 Place bombs one by one and receive hit information
 Waiting for opponent
 
-Close/reopen game
+//Close/reopen game
 
 Exponential polling time
+
+Forfeiting game

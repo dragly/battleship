@@ -16,6 +16,10 @@ userManager = new UserManager();
 gameManager = new GameManager(userManager);
 
 function newUser(response, postData) {
+
+    //var test = JSON.parse(postData);
+    console.log("data: ");
+    console.log(querystring.parse(postData));
     console.log("Request handler 'newUser' was called.");
     response.writeHead(200, {"Content-Type": defaultHeader});
     var user = userManager.addUser();
@@ -39,7 +43,9 @@ function randomGame(response, postData) {
         return;
     }
     var game = gameManager.randomGame(user);
-    response.write(JSON.stringify(game));
+    var gameData = gameManager.convertGameToGameData(user, game);
+    console.log("Writing random game: " + JSON.stringify(gameData));
+    response.write(JSON.stringify(gameData));
     response.end();
 }
 
@@ -67,23 +73,32 @@ function status(response, postData) {
     response.end();
 }
 
+// Receives a list of the current games on client.
+// Returns a list of games that are updated or not on the client side
 function gameList(response, postData) {
     console.log("Request handler 'gameList' was called.");
     response.writeHead(200, {"Content-Type": defaultHeader});
     console.log("Received post data: " + postData);
 
     var post = querystring.parse(postData);
-    var receivedUser = JSON.parse(post.json);
-    var user = userManager.findUserByID(receivedUser.userID);
+    var receivedJson = JSON.parse(post.json);
+    var user = userManager.findUserByID(receivedJson.user.userID);
     if(user === null) {
         response.write("ERROR user not found");
         response.end();
         return;
     }
+    var gamesToReturn = gameManager.findUpdatedGames(user, receivedJson.games);
+    var gamesToReturnLite = new Array();
+    for(var i = 0; i < gamesToReturn.length; i++) {
+        var game = gamesToReturn[i];
+        var gameData = gameManager.convertGameToGameData(user, game);
+        // TODO Send data about boats and tiles
+        gamesToReturnLite.push(gameData);
+    }
 
-    var gamesToReturn = gameManager.gameList(user);
-    response.write(JSON.stringify(gamesToReturn));
-    console.log("Writing: " + JSON.stringify(gamesToReturn));
+    response.write(JSON.stringify(gamesToReturnLite));
+    console.log("Writing: " + JSON.stringify(gamesToReturnLite));
     response.end();
 }
 

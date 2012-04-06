@@ -19,4 +19,5 @@ OTHER_FILES += \
     mousehelper.js \
     mainmenu.js \
     server/gamemanager.js \
-    server/usermanager.js
+    server/usermanager.js \
+    gamelist.js
