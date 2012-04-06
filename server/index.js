@@ -9,5 +9,6 @@ handle["/randomGame"] = requestHandlers.randomGame;
 handle["/placeBoats"] = requestHandlers.placeBoats;
 handle["/placeBomb"] = requestHandlers.placeBomb;
 handle["/gameList"] = requestHandlers.gameList;
+handle["/shoot"] = requestHandlers.shoot;
 
 server.start(router.route, handle);

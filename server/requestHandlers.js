@@ -28,6 +28,38 @@ function newUser(response, postData) {
     response.end();
 }
 
+function shoot(response, postData) { //var params = { user: user.userID, key: user.key, gameID: game.gameID, tile: index };
+    console.log("Request handler 'shoot' was called.");
+    response.writeHead(200, { "Content-Type": defaultHeader });
+    var data = JSON.parse(post.json);
+
+    //TODO:process shot
+    //1.check if shot was legal
+    //1.1 add to shotmask
+
+    //game.
+    //check vs boatmask
+
+    //2.progress gamestate/remove ammo
+    //3.check if a boat was hit
+    //  3.1 If a boat was hit, call "Boat hit logic", and end game if nececarry.
+    //  3.2 send the boat element as newBoatSunk if the boat
+
+    gameManager.findGameByID(data.gameID);
+    //fire shot if legal
+
+    var gameData = { success: true, index: data.index, boat: false };
+
+    //var boat = boatAtIndex(data.index); //TODO, implement the following functionality.
+    //if (boat.isSunk())
+    //    gameData.newBoatSunk = boat;
+
+    //(gameData.success,gameData.index,gameData.boat, gameData.newBoatSunk
+    //data.gameID;
+    response.write(JSON.stringify(gameData));
+    response.end();    
+}
+
 function randomGame(response, postData) {
     console.log("Request handler 'randomGame' was called.");
     response.writeHead(200, {"Content-Type": defaultHeader});
@@ -108,3 +140,4 @@ exports.placeBoats = placeBoats;
 exports.placeBomb = placeBomb;
 exports.status = status;
 exports.gameList = gameList;
+exports.shoot = shoot;

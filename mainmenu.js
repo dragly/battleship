@@ -152,27 +152,21 @@ MainMenu.prototype.requestShootAtTile = function (index) {
     this.communicator.requestShootTile(this.currentGame, index);
 }
 
-MainMenu.prototype.recievedShootAtTile = function (success, index, boat, newBoatSunk)  {
+MainMenu.prototype.recievedShootAtTile = function (success, index, boat, newBoatSunk) {
     this.hideLoadingMessage();
 
-    if (!success)
+    if (!success) //TODO: display an error, or reload the game
         return;
 
-    theirBoats.index
-}
+    MaskHelper.setIndex(game.theirShotMask, index);
 
+    if (boat)
+        MaskHelper.setIndex(game.theirBoatMask, index);
 
-
-
-
-
+    if (newBoatSunk != undefined) //append a boat object
+        theirBoats.push(newBoatSunk);
 
     //TODO: remove one ammo or complete turn if we're out of ammo
-
-
-    this.hideLoadingMessage(); gameData.success, gameData.index, gameData.boat
-    this.showGameList();
-          
 }
 
 MainMenu.prototype.requestNewUser = function () {
