@@ -86,6 +86,7 @@ MainMenu.prototype.showGameList = function() {
             this.newRandomGameButton.show();
 
             this.redraw();
+            $.mobile.changePage("#gameListPage");
         }
 
 MainMenu.prototype.showGame = function (game) {
@@ -97,15 +98,19 @@ MainMenu.prototype.showGame = function (game) {
             this.buttonHandler.hideAll();
             this.goToGameListButton.show();
 
+
             this.redraw();
+            $.mobile.changePage("#gamePage");
         }
 
 MainMenu.prototype.requestNewUser = function() {
+            $.mobile.showPageLoadingMsg("a","Connecting to server...", false);
             var self = this;
             // TODO add this to the communicator class
             this.communicator.requestNewUser(function(statusCode, user) {self.receivedNewUser(statusCode, user)});
         }
 MainMenu.prototype.receivedNewUser = function(statusCode, user) {
+            $.mobile.hidePageLoadingMsg();
             if(statusCode === 408) {
                 console.log("Timed out requesting user...");
             } else if(statusCode === 0) {
@@ -119,17 +124,27 @@ MainMenu.prototype.receivedNewUser = function(statusCode, user) {
         }
 
 MainMenu.prototype.requestGameList = function() {
+            $.mobile.showPageLoadingMsg("a","Loading game list...", false);
             var self = this;
             // TODO add this to the communicator class
             this.communicator.requestGameList(this.user, function(statusCode, user) {self.receivedGameList(statusCode, user)});
         }
 MainMenu.prototype.receivedGameList = function(statusCode, games) {
+            $.mobile.hidePageLoadingMsg();
             if(statusCode === 408) {
                 console.log("Timed out requesting gameList...");
             } else if(statusCode === 0) {
                 console.log("A game list was returned successfully!");
                 this.games = games;
                 console.log("We now have " + this.games.length + " games available to play.")
+                $("#gameList").empty();
+                for(var i = 0; i < games.length; i++) {
+                    $("<li></li>")
+                          .text("Testing")
+                          .appendTo($("#gameList"));
+                }
+                $("#gameList").listview("refresh"); // This line now updates the listview
+
                 this.redraw();
             } else {
                 console.log("ERROR: Unknown status code " + statusCode);
@@ -137,10 +152,12 @@ MainMenu.prototype.receivedGameList = function(statusCode, games) {
         }
 
 MainMenu.prototype.requestRandomGame = function() {
+            $.mobile.showPageLoadingMsg("a","Requesting a random game...", false);
             var self = this;
             this.communicator.requestRandomGame(this.user, function(statusCode, game) {self.receivedRandomGame(statusCode, game);});
         }
 MainMenu.prototype.receivedRandomGame = function(statusCode, game) {
+            $.mobile.hidePageLoadingMsg();
             console.log("Received game");
             games.push(game);
             this.showGame(game);

@@ -1,7 +1,21 @@
 <html>  
   <head>  
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Canvas tutorial</title>
-        <script type="application/javascript" src="jquery.js"></script>
+
+        <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0.1/jquery.mobile-1.0.1.min.css" />
+        <style>
+            /* App custom styles */
+        </style>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js">
+        </script>
+
+        <script src="http://code.jquery.com/mobile/1.0.1/jquery.mobile-1.0.1.min.js">
+        </script>
+
+
+<!--        <script type="application/javascript" src="jquery.js"></script>-->
         <script type="application/javascript" src="mouseHelper.js"></script>
         <script type="application/javascript" src="boat.js"></script>
         <script type="application/javascript" src="button.js"></script>
@@ -15,6 +29,57 @@
     <link rel="stylesheet" type="text/css" href="css/layout.css" />
   </head>  
   <body onload="main();">
-    <canvas id="canvas" width="480" height="640"></canvas>
-  </body>  
-</html> 
+  <div data-role="page" id="loginPage">
+  <div data-theme="a" data-role="header">
+      <h3>
+          Battleship
+      </h3>
+  </div>
+  <a data-role="button" data-transition="fade" onclick="mainMenu.requestNewUser()">
+      Create new user
+  </a>
+  </div>
+  <div data-role="page" id="gameListPage">
+      <div data-theme="a" data-role="header">
+          <h3>
+              Battleship
+          </h3>
+      </div>
+
+
+      <div data-role="content">
+          <ul data-role="listview" data-divider-theme="b" data-inset="true" id="gameList">
+              <li data-role="list-divider" role="heading" id="gameListDivider">
+                  Current games
+              </li>
+              <li data-theme="c">
+                  <a href="#page1" data-transition="slide">
+                      Game 1
+                  </a>
+              </li>
+
+              <li data-theme="c">
+                  <a href="#page2" data-transition="slide">
+                      Game 2
+                  </a>
+              </li>
+          </ul>
+          <a data-role="button" data-transition="fade" onclick="mainMenu.requestRandomGame()">
+              New Random game
+          </a>
+      </div>
+  </div>
+
+  <div data-role="page" id="gamePage">
+  <div data-theme="a" data-role="header">
+      <h3>
+          Battleship
+      </h3>
+  </div>
+  <canvas id="canvas" width="480" height="640"></canvas>
+  <a data-role="button" data-transition="fade" onclick="mainMenu.showGameList()">
+      Back to game list
+  </a>
+  </div>
+  </body>
+</html>
