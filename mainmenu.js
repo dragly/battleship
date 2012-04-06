@@ -155,7 +155,6 @@ MainMenu.prototype.recievedShootAtTile = function (success, index, boat, newBoat
         return;
 
     MaskHelper.setIndex(game.theirShotMask, index);
-}
 
     if (boat)
         MaskHelper.setIndex(game.theirBoatMask, index);

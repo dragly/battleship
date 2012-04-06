@@ -15,7 +15,7 @@ function Game(nRows, nCols) {
     this.nCols = nCols;
     this.user = new Array();
     
-    this players = new Array();
+    this.players = new Array();
     this.players[0] = new GamerUserData();    
     this.players[1] = new GamerUserData();    
 
@@ -27,7 +27,9 @@ function Game(nRows, nCols) {
         this.players[1].ShotMask.push(0);
     }
 }
-Game.prototype.getIndexOfUserID(userID);
+Game.prototype.getIndexOfUserID = function(userID) {
+
+}
 
 
 Game.prototype.hasUser = function (user) {
