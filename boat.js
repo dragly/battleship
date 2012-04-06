@@ -1,7 +1,7 @@
 
 function Boat(size) {
     this.index = -1;
-    this.horizontal = 0;
+    this.horizontal = false;
     this.size = size;
     this.width = 0;
     this.height = 0;

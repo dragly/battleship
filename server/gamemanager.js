@@ -1,4 +1,5 @@
 var Game = require("./game").Game;
+var MaskHelper = require("../shared/maskhelper.js").MaskHelper;
 
 function GameManager(userManager) {
     this.games = new Array();
@@ -97,7 +98,7 @@ GameManager.prototype.convertGameToGameData = function(user, game) {
                 ourShotMask = game.p1ShotMask;
 
                 opponent = game.p2user;
-                theirBoats = game.p2Boats;
+                theirBoats = game.findHitBoats(2);
                 theirBoatMask = game.p2BoatMask;
                 theirShotMask = game.p2ShotMask;
             } else {
@@ -107,10 +108,12 @@ GameManager.prototype.convertGameToGameData = function(user, game) {
                 ourShotMask = game.p2ShotMask;
 
                 opponent = game.p1user;
-                theirBoats = game.p1Boats;
+                theirBoats = game.findHitBoats(1);
                 theirBoatMask = game.p1BoatMask;
                 theirShotMask = game.p1ShotMask;
             }
+            // set their boatMask to only those that we have shot
+            theirBoatMask = MaskHelper.and(theirBoatMask, theirShotMask);
 
             // TODO Send our boats, our shot mask, our boat mask, their shot mask, our hit mask
             return {
