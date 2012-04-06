@@ -4,7 +4,7 @@ function GameUserData() {
     user = 0;
     boats = new Array();
     boatMask = new Array();
-    ShotMask = new Array();
+    shotMask = new Array();
 }
 
 function Game(nRows, nCols) {
@@ -21,10 +21,10 @@ function Game(nRows, nCols) {
 
 
     for (i = 0; i < (nRows * nCols) / 32; i++) {
-        this.players[0].BoatMask.push(0);
-        this.players[1].BoatMask.push(0);
-        this.players[0].ShotMask.push(0);
-        this.players[1].ShotMask.push(0);
+        this.players[0].boatMask.push(0);
+        this.players[1].boatMask.push(0);
+        this.players[0].shotMask.push(0);
+        this.players[1].shotMask.push(0);
     }
 }
 Game.prototype.getIndexOfUserID = function(userID) {
@@ -40,22 +40,22 @@ Game.prototype.hasUser = function (user) {
     }
 }
 
-Game.prototype.findDestroyedBoats = function(player) {
+Game.prototype.findDestroyedboats = function(player) {
             var boats;
             var shotMask;
             if(player === 1) {
-                boats = this.players[0].Boats;
-                shotMask = this.players[0].ShotMask;
+                boats = this.players[0].boats;
+                shotMask = this.players[0].shotMask;
             } else {
-                boats = this.players[1].Boats;
-                shotMask = this.players[1].ShotMask;
+                boats = this.players[1].boats;
+                shotMask = this.players[1].shotMask;
             }
-            var hitBoats = new Array();
+            var hitboats = new Array();
             for(var i = 0; i < boats.length; i++) {
                 var boat = boats[i];
                 var boatHitMask = MaskHelper.and(boat.mask(), shotMask);
                 if(MaskHelper.compare(boatHitMask, boat.mask())) {
-                    hitBoats.push(boat);
+                    hitboats.push(boat);
                 }
             }
         }

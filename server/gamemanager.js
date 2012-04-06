@@ -85,35 +85,35 @@ GameManager.prototype.findGameByID = function(gameID) {
 
 GameManager.prototype.convertGameToGameData = function(user, game) {
             var opponent;
-            var ourBoats;
-            var ourBoatMask;
-            var ourShotMask;
-            var theirBoats;
-            var theirBoatMask;
-            var theirShotMask;
+            var ourboats;
+            var ourboatMask;
+            var ourshotMask;
+            var theirboats;
+            var theirboatMask;
+            var theirshotMask;
             if(game.players[0].user.userID === user.userID) {
                 // we are user 1
-                ourBoats = game.players[0].Boats;
-                ourBoatMask = game.players[0].BoatMask;
-                ourShotMask = game.players[0].ShotMask;
+                ourboats = game.players[0].boats;
+                ourboatMask = game.players[0].boatMask;
+                ourshotMask = game.players[0].shotMask;
 
                 opponent = game.players[2].userID;
-                theirBoats = game.findDestroyedBoats(2);
-                theirBoatMask = game.players[2].BoatMask;
-                theirShotMask = game.players[2].ShotMask;
+                theirboats = game.findDestroyedboats(2);
+                theirboatMask = game.players[2].boatMask;
+                theirshotMask = game.players[2].shotMask;
             } else {
                 // we are user 2
-                ourBoats = game.players[2].Boats;
-                ourBoatMask = game.players[2].BoatMask;
-                ourShotMask = game.players[2].ShotMask;
+                ourboats = game.players[2].boats;
+                ourboatMask = game.players[2].boatMask;
+                ourshotMask = game.players[2].shotMask;
 
                 opponent = game.players[0].userID;
-                theirBoats = game.findDestroyedBoats(1);
-                theirBoatMask = game.players[0].BoatMask;
-                theirShotMask = game.players[0].ShotMask;
+                theirboats = game.findDestroyedboats(1);
+                theirboatMask = game.players[0].boatMask;
+                theirshotMask = game.players[0].shotMask;
             }
             // set their boatMask to only those that we have shot
-            theirBoatMask = MaskHelper.and(theirBoatMask, theirShotMask);
+            theirboatMask = MaskHelper.and(theirboatMask, theirshotMask);
 
             // TODO Send our boats, our shot mask, our boat mask, their shot mask, our hit mask
             return {
@@ -122,12 +122,12 @@ GameManager.prototype.convertGameToGameData = function(user, game) {
                     username: opponent.username
                 },
                 gameID: game.gameID,
-                ourBoats: ourBoats,
-                ourBoatMask: ourBoatMask,
-                ourShotMask: ourShotMask,
-                theirBoats: theirBoats,
-                theirBoatMask: theirBoatMask,
-                theirShotMask: theirShotMask
+                ourboats: ourboats,
+                ourboatMask: ourboatMask,
+                ourshotMask: ourshotMask,
+                theirboats: theirboats,
+                theirboatMask: theirboatMask,
+                theirshotMask: theirshotMask
             };
         }
 
