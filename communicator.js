@@ -60,7 +60,7 @@ Communicator.prototype.requestShootTile = function (user, game, index, callback)
 Communicator.prototype.requestRandomGame = function (user, callback) {
     var self = this;
     console.log("Requesting random game");
-            var params = {user: user.authData()};
+    var params = {user: user.authData()};
     this.ajaxCall("http://" + this.serverUrl + "/randomGame", function (response) { self.receivedRandomGame(response, callback); }, params);
 }
 
@@ -77,7 +77,7 @@ Communicator.prototype.receivedRandomGame = function (gameData, callback) {
 Communicator.prototype.requestGameList = function (user, callback) {
     var self = this;
     console.log("Requesting game list");
-    var params = "json=" + JSON.stringify(user);
+    var params = {user: user.authData()};
     this.ajaxCall("http://" + this.serverUrl + "/gameList", function (response) { self.receivedGameList(response, callback); },params);
 }
 

@@ -153,22 +153,6 @@ MainMenu.prototype.recievedShootAtTile = function (success, index, boat, newBoat
 
     if (!success)
         return;
-
-    theirBoats.index
-}
-
-
-
-
-
-
-
-    //TODO: remove one ammo or complete turn if we're out of ammo
-
-
-    this.hideLoadingMessage(); gameData.success, gameData.index, gameData.boat
-    this.showGameList();
-          
 }
 
 MainMenu.prototype.requestNewUser = function () {
