@@ -39,7 +39,9 @@ function randomGame(response, postData) {
         return;
     }
     var game = gameManager.randomGame(user);
-    response.write(JSON.stringify(game));
+    var gameData = gameManager.convertGameToGameData(user, game);
+    console.log("Writing random game: " + JSON.stringify(gameData));
+    response.write(JSON.stringify(gameData));
     response.end();
 }
 
@@ -67,59 +69,31 @@ function status(response, postData) {
     response.end();
 }
 
+// Receives a list of the current games on client.
+// Returns a list of games that are updated or not on the client side
 function gameList(response, postData) {
     console.log("Request handler 'gameList' was called.");
     response.writeHead(200, {"Content-Type": defaultHeader});
     console.log("Received post data: " + postData);
 
     var post = querystring.parse(postData);
-    var receivedUser = JSON.parse(post.json);
-    var user = userManager.findUserByID(receivedUser.userID);
+    var receivedJson = JSON.parse(post.json);
+    var user = userManager.findUserByID(receivedJson.user.userID);
     if(user === null) {
         response.write("ERROR user not found");
         response.end();
         return;
     }
-
-    var gamesToReturn = gameManager.gameList(user);
+    var gamesToReturn = gameManager.findUpdatedGames(user, receivedJson.games);
     var gamesToReturnLite = new Array();
     for(var i = 0; i < gamesToReturn.length; i++) {
         var game = gamesToReturn[i];
-        gamesToReturnLite.push({
-                                   turn: game.turn,
-                                   gameID: game.gameID
-                               });
+        var gameData = gameManager.convertGameToGameData(user, game);
+        // TODO Send data about boats and tiles
+        gamesToReturnLite.push(gameData);
     }
 
     response.write(JSON.stringify(gamesToReturnLite));
-    console.log("Writing: " + JSON.stringify(gamesToReturnLite));
-    response.end();
-}
-
-function game(response, postData) {
-    console.log("Request handler 'game' was called.");
-    response.writeHead(200, {"Content-Type": defaultHeader});
-    console.log("Received post data: " + postData);
-
-    var post = querystring.parse(postData);
-    var receivedJson = JSON.parse(post.json);
-    // TODO Authenticate
-    var user = userManager.findUserByID(receivedJson.user.userID);
-    var game = gameManager.findGameByID(receivedJson.game.gameID);
-
-    // TODO Proper error handling
-    if(user === null) {
-        response.write("ERROR user not found");
-        response.end();
-        return;
-    }
-    if(game === null) {
-        response.write("ERROR game not found");
-        response.end();
-        return;
-    }
-
-    response.write(JSON.stringify(game));
     console.log("Writing: " + JSON.stringify(gamesToReturnLite));
     response.end();
 }
@@ -130,4 +104,3 @@ exports.placeBoats = placeBoats;
 exports.placeBomb = placeBomb;
 exports.status = status;
 exports.gameList = gameList;
-exports.game = game;

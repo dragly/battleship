@@ -24,7 +24,7 @@ var MenuState = {
 function MainMenu() {
     this.mouseHelper = new MouseHelper();
     this.communicator = new Communicator();
-    this.gameList = new GameList();
+    this.gameList = new GameList(this);
     this.communicator.serverUrl = "localhost:8888";
     this.menuState = MenuState.Login; // 0 - game menu, 1 - our table, 2 - their table, 3 - login user
     this.gameState = GameState.PlaceBoats; // 0 - place boats, 1 - waiting for opponent, 2 - your turn, 3 - their turn
@@ -45,7 +45,14 @@ function MainMenu() {
     // Catch all errors
     $(document).ajaxError(function() {
                               self.httpError();
-                })
+                          })
+    // Set up JQuery mobile
+    $(document).bind("mobileinit", function(){
+                         $.extend(  $.mobile , {
+                                      defaultPageTransition: 'none',
+                                      defaultDialogTransition: 'none'
+                                  });
+                     });
 }
 
 MainMenu.prototype.httpError = function() {
@@ -53,7 +60,7 @@ MainMenu.prototype.httpError = function() {
             console.log("Received HTTP error!");
             this.communicator.stopAll();
             alert("Could not connect to the game server. Please try again later.");
-}
+        }
 
 MainMenu.prototype.hideLoadingMessage = function() {
             $.mobile.hidePageLoadingMsg();
@@ -134,7 +141,6 @@ MainMenu.prototype.showGame = function (game) {
             this.buttonHandler.hideAll();
             this.goToGameListButton.show();
 
-
             this.redraw();
             $.mobile.changePage("#gamePage");
         }
@@ -167,7 +173,8 @@ MainMenu.prototype.requestGameList = function() {
                 this.showLoginScreen();
                 return;
             }
-            this.communicator.requestGameList(this.user, function(statusCode, user) {self.receivedGameList(statusCode, user)});
+
+            this.communicator.requestGameList(this.user, this.gameList.games, function(statusCode, user) {self.receivedGameList(statusCode, user)});
         }
 
 MainMenu.prototype.receivedGameList = function(statusCode, games) {
@@ -176,7 +183,7 @@ MainMenu.prototype.receivedGameList = function(statusCode, games) {
                 console.log("Timed out requesting gameList...");
             } else if(statusCode === 0) {
                 console.log("A game list was returned successfully!");
-                this.gameList.setGames(games);
+                this.gameList.addGames(games);
                 this.redraw();
             } else {
                 console.log("ERROR: Unknown status code " + statusCode);
@@ -197,7 +204,7 @@ MainMenu.prototype.requestRandomGame = function() {
 MainMenu.prototype.receivedRandomGame = function(statusCode, game) {
             this.hideLoadingMessage();
             console.log("Received game");
-            games.push(game);
+            this.gameList.addGames([game]);
             this.showGame(game);
         }
 
@@ -248,7 +255,7 @@ MainMenu.prototype.redraw = function() {
             //this.ctx.fillRect(100, this.canvas.height - 150, 200, 50);
 
             // Refresh the list of games
-//            this.gameList.refresh();
+            //            this.gameList.refresh();
         }
 
 
@@ -299,9 +306,9 @@ MainMenu.prototype.canvasMouseUp = function (e) {
                         switch (this.gameState) {
                         case GameState.PlaceBoats:
                             // TODO it is not automatically our turn! Wait for data from server.
-//                            sendBoatsToServer();
-//                            this.gameState = 2;
-//                            this.menuState = 2;
+                            //                            sendBoatsToServer();
+                            //                            this.gameState = 2;
+                            //                            this.menuState = 2;
                             break;
                         case GameState.Waiting:
                             if (this.menuState == 2) {

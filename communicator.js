@@ -55,10 +55,19 @@ Communicator.prototype.receivedRandomGame = function(responseText, callback) {
             callback(0, game);
         }
 
-Communicator.prototype.requestGameList = function(user, callback) {
+Communicator.prototype.requestGameList = function(user, games, callback) {
             var self = this;
-            console.log("Requesting game list");
-            var params = "json=" + JSON.stringify(user);
+            console.log("Requesting game list by sending " + games.length + " games");
+            var gamesToRequests = new Array();
+            for(var i = 0; i < games.length; i++) {
+                var game = games[i];
+                gamesToRequests.push({
+                                         turn: game.turn,
+                                         gameID: game.gameID
+                                     });
+            }
+            console.log("Requesting " + gamesToRequests.length + " games")
+            var params = "json=" + JSON.stringify({user: user, games: gamesToRequests});
             $.post("http://" + this.serverUrl + "/gameList", params, function(responseText) { self.receivedGameList(responseText, callback); });
 
         }

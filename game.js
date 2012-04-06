@@ -6,4 +6,5 @@ function Game() {
     this.theirTiles = new Array();
     this.ourBoats = new Array();
     this.theirBoats = new Array();
+    this.opponent = null;
 }

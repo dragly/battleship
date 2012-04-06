@@ -35,11 +35,37 @@ GameManager.prototype.randomGame = function(user) {
         }
 
 // Return list of games for user
-GameManager.prototype.gameList = function(user) {
+GameManager.prototype.findGamesByUser = function(user) {
             var gamesToReturn = new Array();
             for(var i = 0; i < this.games.length; i++) {
                 var game = this.games[i];
                 if(game.hasUser(user)) {
+                    gamesToReturn.push(game);
+                }
+            }
+            return gamesToReturn;
+        }
+
+// Return list of updated games for user
+GameManager.prototype.findUpdatedGames = function(user, currentGames) {
+            var gamesToReturn = new Array();
+            var userGames = this.findGamesByUser(user);
+            for(var i = 0; i < userGames.length; i++) {
+                var game = userGames[i];
+                var clientHadGame = false;
+                for(var j = 0; j < currentGames.length; j++) {
+                    var currentGame = currentGames[j];
+                    if(game.gameID === currentGame.gameID) {
+                        clientHadGame = true;
+                        // check if user is in game and that
+                        if(game.turn > currentGame.turn) {
+                            console.log("Pushing game with newer turn");
+                            gamesToReturn.push(game);
+                        }
+                    }
+                }
+                if(!clientHadGame) {
+                    console.log("Pushing a game the client did not have");
                     gamesToReturn.push(game);
                 }
             }
@@ -54,6 +80,22 @@ GameManager.prototype.findGameByID = function(gameID) {
                 }
             }
             return null;
+        }
+
+GameManager.prototype.convertGameToGameData = function(user, game) {
+            var opponent;
+            if(game.p1user.userID === user.userID) {
+                opponent = game.p2user;
+            } else {
+                opponent = game.p1user;
+            }
+            return {
+                opponent: {
+                    userID: opponent.userID,
+                    username: opponent.username
+                },
+                gameID: game.gameID
+            };
         }
 
 exports.GameManager = GameManager;
