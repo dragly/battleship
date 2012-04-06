@@ -1,3 +1,5 @@
+var MaskHelper = require("../shared/maskhelper.js").MaskHelper;
+
 function Game(nRows, nCols) {
     this.gameID = "";
     this.turn = 0;
@@ -29,12 +31,24 @@ Game.prototype.hasUser = function (user) {
     }
 }
 
-Game.prototype.compareMasks = function (mask1, mask2) {
-    var outMask = new Array();
-    for (var i = 0; i < mask1.length; i++) {
-        outMask[i] = mask1[i] & mask2[i];
-    }
-    return outMask;
-}
+Game.prototype.findDestroyedBoats = function(player) {
+            var boats;
+            var shotMask;
+            if(player === 1) {
+                boats = this.p1Boats;
+                shotMask = this.p1ShotMask;
+            } else {
+                boats = this.p2Boats;
+                shotMask = this.p2ShotMask;
+            }
+            var hitBoats = new Array();
+            for(var i = 0; i < boats.length; i++) {
+                var boat = boats[i];
+                var boatHitMask = MaskHelper.and(boat.mask(), shotMask);
+                if(MaskHelper.compare(boatHitMask, boat.mask())) {
+                    hitBoats.push(boat);
+                }
+            }
+        }
 
 exports.Game = Game;

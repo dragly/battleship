@@ -20,4 +20,5 @@ OTHER_FILES += \
     mainmenu.js \
     server/gamemanager.js \
     server/usermanager.js \
-    gamelist.js
+    gamelist.js \
+    shared/maskhelper.js
