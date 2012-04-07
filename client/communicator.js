@@ -65,20 +65,26 @@ Communicator.prototype.receivedNewUser = function (receivedUserData, callback) {
     callback(myUser);
 }
 
-Communicator.prototype.recievedShootTile = function (gameData, callback) {
+Communicator.prototype.receivedShootTile = function (gameData, callback) {
     mainMenu.hideLoadingMessage();
-
+    var newBoatSunk = undefined;
+    if (gameData.newBoatSunk) {
+        newBoatSunk = new Boat();
+        ObjectHelper.copyDataToObject(gameData.newBoatSunk, newBoatSunk, ["index", "size", "horizontal"]);
+        // TODO This is really bad. Find nCols from somehwere or do this update position while drawing instead!
+        newBoatSunk.updatePosition(8);
+    }
     //handle gamestate
     if (gameData.success)
-        callback(gameData.index, gameData.boat, gameData.remainingShots, gameData.newBoatSunk);
-    else 
+        callback(gameData.index, gameData.boat, gameData.remainingShots, newBoatSunk);
+    else
         console.log("Error: Illegal shoot action!");
 }
 
 
 Communicator.prototype.requestShootTile = function (user, game, index, callback) {
     var self = this;
-    var params = { user: user.authData(), gameID: game.gameID, tile: index };
+    var params = { user: user.authData(), gameID: game.gameID, index: index };
     this.ajaxCall("http://" + this.serverUrl + "/shoot", function (response) { self.receivedShootTile(response, callback); }, params);
 }
 
@@ -99,15 +105,16 @@ Communicator.prototype.requestGameList = function (user, games, callback) {
     var self = this;
     console.log("Requesting game list by sending " + games.length + " games");
     var gamesToRequests = new Array();
-    for(var i = 0; i < games.length; i++) {
+    for (var i = 0; i < games.length; i++) {
         var game = games[i];
+        console.log("game.turn: " + game.turn);
         gamesToRequests.push({
-                                 turn: game.turn,
-                                 gameID: game.gameID
-                             });
+            turn: game.turn,
+            gameID: game.gameID
+        });
     }
-    var params = {user: user.authData(), games: gamesToRequests};
-    this.ajaxCall("http://" + this.serverUrl + "/gameList", function (response) { self.receivedGameList(response, callback); },params);
+    var params = { user: user.authData(), games: gamesToRequests };
+    this.ajaxCall("http://" + this.serverUrl + "/gameList", function (response) { self.receivedGameList(response, callback); }, params);
 }
 
 Communicator.prototype.receivedGameList = function (gamesData, callback) {

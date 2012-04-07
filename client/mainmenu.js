@@ -29,7 +29,7 @@ function MainMenu() {
     this.currentGame = 0;
     this.lastPosX = 0;
     this.lastPosY = 0;
-    this.currentAmmo = 0;
+    this.crosshairIndex = -1;
 
     //Buttons
     var self = this;
@@ -40,6 +40,7 @@ function MainMenu() {
     this.placeBoatsButton = new Button(this.buttonHandler, 100, 400, 200, 50, "Place boats", function () { self.requestPlaceBoats() });
     this.goToGameListButton = new Button(this.buttonHandler, 100, 500, 200, 50, "Exit to Game List", function () { self.showGameList() });
     this.switchBoardsButton = new Button(this.buttonHandler, 100, 400, 200, 50, "Switch board", function () { self.switchBoards() });
+    this.shootButton = new Button(this.buttonHandler, 100, 450, 200, 50, "Switch board", function () { self.requestShootAtTile() });
 
     // Set up JQuery mobile
     $(document).bind("mobileinit", function () {
@@ -73,12 +74,17 @@ MainMenu.prototype.showOurBoard = function() {
     $.mobile.changePage("#gamePage");
 }
 
-MainMenu.prototype.showTheirBoard = function() {
+MainMenu.prototype.showTheirBoard = function () {
+    this.crosshairIndex = -1;
     this.menuState = MenuState.Theirs;
     // Decide what buttons to show
     this.buttonHandler.hideAll();
     this.goToGameListButton.show();
     this.switchBoardsButton.show();
+
+    if (this.currentGame.gameState === GameState.OurTurn)
+        this.shootButton.show();
+
     this.redraw();
     $.mobile.changePage("#gamePage");
 }
@@ -103,6 +109,28 @@ MainMenu.prototype.showLoadingMessage = function (message) {
 MainMenu.prototype.clear = function () {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 }
+
+//set crosshair index
+MainMenu.prototype.setCrosshairIndex = function () {
+
+    var bestFit = 99999999;
+    var bestFitIndex = 0;
+    for (var i = 0; i < this.currentGame.nRows; i++) {
+        for (var j = 0; j < this.currentGame.nCols; j++) {
+            var index = i * this.currentGame.nCols + j;
+            var diffX = j * tileSize - this.lastPosX + tileSize / 2;
+            var diffY = i * tileSize - this.lastPosY + tileSize / 2;
+            var ourFit = diffX * diffX + diffY * diffY;
+            if (ourFit < bestFit) {
+                bestFit = ourFit;
+                bestFitIndex = index;
+            }
+        }
+    }
+    if (bestFit < tileSize / 2 * tileSize / 2 + tileSize / 2 * tileSize / 2)
+        this.crosshairIndex = bestFitIndex;
+}
+
 
 // Initialize everything. Check for user id. Load settings.
 MainMenu.prototype.initApplication = function () {
@@ -179,31 +207,32 @@ MainMenu.prototype.showGame = function (game) {
     this.showOurBoard();
 }
 
-MainMenu.prototype.requestShootAtTile = function (index) {
+MainMenu.prototype.requestShootAtTile = function () {
     this.showLoadingMessage("Fire in ze hole!"); //"bombs away!", "missle on route!"
+    var self = this;
     //check selected tile, check ammo
     //Check if we're allowed to shoot at the tile? //show an error dialog
-    this.communicator.requestShootTile(this.currentGame, index);
+    this.communicator.requestShootTile(this.user, this.currentGame, this.crosshairIndex, function (index, boat, remainingAmmo, newBoatSunk) { self.recievedShootAtTile(index, boat, remainingAmmo, newBoatSunk); });
 }
 
 MainMenu.prototype.recievedShootAtTile = function (index, boat, remainingAmmo, newBoatSunk) {
 
-    MaskHelper.setIndex(game.theirShotMask, index);
+    MaskHelper.setIndex(this.currentGame.theirShotMask, index);
 
-    this.currentAmmo = remainingAmmo;
+    this.currentGame.currentAmmo = remainingAmmo;
 
     //check if turn is over
     if (remainingAmmo === 0)
         this.showTheirBoard();
 
     if (boat) { //if we hit a boat
-        MaskHelper.setIndex(game.theirBoatMask, index);
+        MaskHelper.setIndex(this.currentGame.theirBoatMask, index);
 
         if (newBoatSunk != undefined) { //append a boat object
-            theirBoats.push(newBoatSunk);
+            this.currentGame.theirBoats.push(newBoatSunk);
 
             //check if the game is over
-            if (MaskHelper.compare(MaskHelper.and(game.theirBoatMask, game.theirShotMask), game.theirBoatMask))
+            if (MaskHelper.compare(MaskHelper.and(this.currentGame.theirBoatMask, this.currentGame.theirShotMask), this.currentGame.theirBoatMask))
                 this.showWeWon();
         }
     }
@@ -296,7 +325,7 @@ MainMenu.prototype.redraw = function () {
                 var hasHit = MaskHelper.getValueOfIndex(this.currentGame.ourShotMask, index);
                 var hasBoat = MaskHelper.getValueOfIndex(this.currentGame.ourBoatMask, index);
                 if (hasHit) {
-                    if(hasBoat) {
+                    if (hasBoat) {
                         this.ctx.fillStyle = "rgb(255,255,0)";
                     } else {
                         this.ctx.fillStyle = "rgb(255,0,0)";
@@ -320,7 +349,7 @@ MainMenu.prototype.redraw = function () {
                 var hasHit = MaskHelper.getValueOfIndex(this.currentGame.theirShotMask, index);
                 var hasBoat = MaskHelper.getValueOfIndex(this.currentGame.theirBoatMask, index);
                 if (hasHit) {
-                    if(hasBoat) {
+                    if (hasBoat) {
                         this.ctx.fillStyle = "rgb(255,255,0)";
                     } else {
                         this.ctx.fillStyle = "rgb(255,0,0)";
@@ -329,6 +358,13 @@ MainMenu.prototype.redraw = function () {
                     this.ctx.fillStyle = "rgb(0,255,0)";
                 }
                 this.ctx.fillRect(j * tileSize, i * tileSize, tileSize, tileSize);
+                if (index === this.crosshairIndex) {
+                    this.ctx.fillStyle = "#FFFF00";
+                    this.ctx.beginPath();
+                    this.ctx.arc(j * tileSize, i * tileSize, 50, 0, Math.PI * 2, true);
+                    this.ctx.closePath();
+                    this.ctx.fill();
+                }
             }
         }
         for (var i = 0; i < this.currentGame.theirBoats.length; i++) {
@@ -357,6 +393,11 @@ MainMenu.prototype.canvasMouseMove = function (e) {
     var mousePos = this.mouseHelper.getCursorPosition(e, this.canvas);
     this.lastPosX = mousePos.x;
     this.lastPosY = mousePos.y;
+
+    if (this.menuState === MenuState.Theirs && this.currentGame.gameState === GameState.OurTurn) {
+        this.setCrosshairIndex();
+        this.redraw();
+    }
 
     if (this.isDragging !== null) {
         var boat = this.isDragging;
@@ -416,6 +457,8 @@ MainMenu.prototype.canvasMouseDown = function (e) {
                 this.isDragging = boat;
             }
         }
+    } else if (this.menuState === MenuState.Theirs && this.currentGame.gameState === GameState.OurTurn) {
+        this.setCrosshairIndex();
     }
     return false;
 }

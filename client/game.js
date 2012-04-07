@@ -20,6 +20,8 @@ function Game() {
     this.theirBoatMask = new Array();
     this.theirShotMask = new Array();
     this.opponent = null;
+    this.currentAmmo = 0;
+    this.turn = 0;
 
     this.gameState = GameState.PlaceBoats;
 }
@@ -49,7 +51,7 @@ Game.createGameFromData = function(gameData) {
         boat.updatePosition(gameData.nCols);
         game.theirBoats.push(boat);
     }
-    ObjectHelper.copyDataToObject(gameData, game, ["ourBoatMask","ourShotMask","theirBoatMask","theirShotMask","nCols","nRows","gameState"]);
+    ObjectHelper.copyDataToObject(gameData, game, ["ourBoatMask","ourShotMask","theirBoatMask","theirShotMask","nCols","nRows","gameState","turn"]);
     
     return game;
 }

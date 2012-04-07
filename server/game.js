@@ -19,7 +19,7 @@ function GameUserData() {
 function Game(nRows, nCols) {
     this.gameID = "";
     this.turn = 0;
-    this.remainingShots = 0;
+    this.remainingShots = 5;
     this.currentPlayer = null;
     this.nRows = nRows;
     this.nCols = nCols;
@@ -107,7 +107,7 @@ Game.convertGameToGameData = function(user, game) {
     } else if(theirPlayer.user === null) {
         // No other user has joined, we are waiting.
         gameState = GameState.Waiting;
-    } else if(game.currentPlayer === ourPlayer.user && !theirPlayer.boatsPlaced) {
+    } else if(game.currentPlayer === ourPlayer.user && theirPlayer.boatsPlaced) {
         // We are the current player and they have placed boats
         gameState = GameState.OurTurn;
     } else {

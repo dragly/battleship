@@ -45,7 +45,7 @@ MaskHelper.setIndex = function (mask, tileIndex) {
 MaskHelper.getValueOfIndex = function (mask, tileIndex) {
     var memberIndex = Math.floor(tileIndex / 32);
     var nBit = tileIndex % 32;
-    return ((mask[memberIndex] & (0x1 << nBit)) != 0);
+    return ((mask[memberIndex] & (0x1 << nBit)) !== 0);
 }
 
 if(typeof exports != 'undefined') {

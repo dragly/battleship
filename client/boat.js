@@ -18,7 +18,7 @@ Boat.prototype.setIndex = function(index) {
 
 Boat.prototype.setHorizontal = function(horizontal) {
     this.horizontal = horizontal;
-    this.updatePosition();
+    this.updatePosition(this.nCols);
 }
 Boat.prototype.draw = function(ctx) {
     ctx.fillStyle = "rgb(100,100,100)";
