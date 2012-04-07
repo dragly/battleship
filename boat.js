@@ -1,6 +1,5 @@
-
+var tileSize = 50;
 var tileMargin = 0;
-var tileSize = 25;
 
 function Boat() {
     this.index = -1;
@@ -12,6 +11,11 @@ function Boat() {
     this.nCols = 0;
 }
 
+Boat.prototype.setIndex = function(index) {
+    this.index = index;
+    this.updatePosition(this.nCols);
+}
+
 Boat.prototype.setHorizontal = function(horizontal) {
     this.horizontal = horizontal;
     this.updatePosition();
@@ -19,7 +23,6 @@ Boat.prototype.setHorizontal = function(horizontal) {
 Boat.prototype.draw = function(ctx) {
     ctx.fillStyle = "rgb(100,100,100)";
     ctx.fillRect(this.x,this.y,this.width,this.height);
-    console.log(this.x, this.width, this.y, this.height);
 }
 
 Boat.prototype.updatePosition = function(nCols) {
@@ -36,4 +39,8 @@ Boat.prototype.updatePosition = function(nCols) {
         this.height = this.length;
         this.width = tileSize / 2;
     }
+}
+
+Boat.prototype.isClicked = function(x,y) {
+            return (x > this.x && y > this.y && x < this.x + this.width && y < this.y + this.height);
 }

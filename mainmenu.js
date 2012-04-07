@@ -1,5 +1,5 @@
 var tileSize = 50;
-var tileMargin = 10;
+var tileMargin = 0;
 
 //var servOurTiles = new Array();
 //var servTheirTiles = new Array();
@@ -31,7 +31,7 @@ function MainMenu() {
     this.canvas = 0;
     this.ctx = 0;
     this.user = null;
-    this.isDragging = -1;
+    this.isDragging = null;
     this.currentGame = 0;
 
     //Buttons
@@ -226,15 +226,7 @@ MainMenu.prototype.redraw = function () {
 
     this.clear();
 
-    if (this.menuState === MenuState.Login) {
-        this.ctx.fillStyle = "rgb(0,0,0)";
-        this.ctx.fillText("Login screen", 100, 100);
-        //this.ctx.fillText("Click to create new user", 100, 200);
-    } else if (this.menuState === MenuState.List) {
-        // TODO Draw the list
-        this.ctx.fillStyle = "rgb(0,0,0)";
-        this.ctx.fillText("Game list", 100, 100);
-    } else if (this.menuState === MenuState.Ours) {
+    if (this.menuState === MenuState.Ours) {
         this.ctx.fillText("Mine", 100, 100);
         // TODO Draw the board
         for(var i = 0; i < this.currentGame.nRows; i++) {
@@ -250,7 +242,6 @@ MainMenu.prototype.redraw = function () {
             }
         }
         for (var i = 0; i < this.currentGame.ourBoats.length; i++) {
-            console.log("Drawing boat " + i);
             this.currentGame.ourBoats[i].draw(this.ctx);
         }
     } else if (this.menuState === MenuState.Theirs) {
@@ -282,8 +273,8 @@ MainMenu.prototype.redraw = function () {
 MainMenu.prototype.canvasMouseMove = function (e) {
     var mousePos = this.mouseHelper.getCursorPosition(e, this.canvas);
 
-    if (this.isDragging > -1) {
-        var boat = this.currentGame.ourBoats[this.isDragging];
+    if (this.isDragging !== null) {
+        var boat = this.isDragging;
         boat.x = mousePos.x - boat.width / 2;
         boat.y = mousePos.y - boat.height / 2;
         this.redraw();
@@ -297,65 +288,28 @@ MainMenu.prototype.canvasMouseUp = function (e) {
     var y = mousePos.y;
 
     if (this.menuState === MenuState.Ours || this.menuState === MenuState.Theirs) {
-        if (this.isDragging > -1) {
+        if (this.isDragging !== null) {
             console.log("Finding best fit!");
-            var boat = this.currentGame.ourBoats[this.isDragging];
+            var boat = this.isDragging;
             var bestFit = 99999999;
-            var bestFitIndex = -1;
-            for (var i = 0; i < nRows * nCols; i++) {
-                var diffX = ourTiles[i].x - x + boat.width / 2;
-                var diffY = ourTiles[i].y - y + boat.height / 2;
-                var ourFit = diffX * diffX + diffY * diffY;
-                if (ourFit < bestFit) {
-                    bestFit = ourFit;
-                    bestFitIndex = i;
+            var bestFitIndex = 0;
+            for (var i = 0; i < this.currentGame.nRows; i++) {
+                for(var j = 0; j < this.currentGame.nCols; j++) {
+                    var index = i * this.currentGame.nCols + j;
+                    var diffX = j * tileSize - x + boat.width / 2;
+                    var diffY = i * tileSize - y + boat.height / 2;
+                    var ourFit = diffX * diffX + diffY * diffY;
+                    if (ourFit < bestFit) {
+                        bestFit = ourFit;
+                        bestFitIndex = index;
+                    }
                 }
             }
             boat.setIndex(bestFitIndex);
-        } else {
-            for (var i = 0; i < this.currentGame.ourTiles.length; i++) {
-                if (this.menuState === 1) {
-                    ourTiles[i].isClicked(x, y);
-                } else if (this.menuState === 2) {
-                    ourTiles[i].isClicked(x, y);
-                }
-            }
-
-            if (x > 150 && x < 150 + 200 && y > this.canvas.height - 150 && y < this.canvas.height - 150 + 50) {
-                switch (this.gameState) {
-                    case GameState.PlaceBoats:
-                        // TODO it is not automatically our turn! Wait for data from server.
-                        //                            sendBoatsToServer();
-                        //                            this.gameState = 2;
-                        //                            this.menuState = 2;
-                        break;
-                    case GameState.Waiting:
-                        if (this.menuState == 2) {
-                            this.menuState = 1;
-                        } else {
-                            this.menuState = 2;
-                        }
-                        break;
-                    case GameState.OurTurn:
-                        if (this.menuState == 2) {
-                            this.menuState = 1;
-                        } else {
-                            this.menuState = 2;
-                        }
-                        break;
-                    case GameState.TheirTurn:
-                        break;
-                }
-                console.log("State " + this.menuState);
-
-                this.redraw();
-
-
-            }
         }
     }
     this.buttonHandler.mouseReleased(x, y);
-    this.isDragging = -1;
+    this.isDragging = null;
     this.redraw();
 }
 
@@ -367,9 +321,10 @@ MainMenu.prototype.canvasMouseDown = function (e) {
     if (this.menuState === MenuState.Ours && this.gameState === GameState.PlaceBoats) {
         console.log("spotted " + this.currentGame.ourBoats.length + "boats. With mouse coord: " + mousePos.x + "," + mousePos.y);
         for (var i = 0; i < this.currentGame.ourBoats.length; i++) {
-            if (this.currentGame.ourBoats[i].isClicked(mousePos.x, mousePos.y)) {
+            var boat = this.currentGame.ourBoats[i];
+            if (boat.isClicked(mousePos.x, mousePos.y)) {
                 console.log("boat clicked!!");
-                this.isDragging = i;
+                this.isDragging = boat;
             }
         }
     }
