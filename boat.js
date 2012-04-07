@@ -1,15 +1,36 @@
+var tileSize = 50;
+var tileMargin = 0;
 
-function Boat(size) {
+function Boat() {
     this.index = -1;
     this.horizontal = false;
-    this.size = size;
+    this.size = 0;
     this.width = 0;
     this.height = 0;
     this.setHorizontal(false);
+    this.nCols = 0;
+}
+
+Boat.prototype.setIndex = function(index) {
+    this.index = index;
+    this.updatePosition(this.nCols);
 }
 
 Boat.prototype.setHorizontal = function(horizontal) {
     this.horizontal = horizontal;
+    this.updatePosition();
+}
+Boat.prototype.draw = function(ctx) {
+    ctx.fillStyle = "rgb(100,100,100)";
+    ctx.fillRect(this.x,this.y,this.width,this.height);
+}
+
+Boat.prototype.updatePosition = function(nCols) {
+    this.nCols = nCols;
+    this.column = this.index % nCols;
+    this.row = Math.floor(this.index / nCols);
+    this.x = tileMargin + this.column * (tileSize + tileMargin) + tileSize / 4;
+    this.y = tileMargin + this.row * (tileSize + tileMargin) + tileSize / 4;
     this.length = tileSize * this.size - tileSize * 3 / 4 + tileMargin * this.size;
     if(this.horizontal) {
         this.width = this.length;
@@ -19,16 +40,7 @@ Boat.prototype.setHorizontal = function(horizontal) {
         this.width = tileSize / 2;
     }
 }
-Boat.prototype.draw = function() {
-    ctx.fillStyle = "rgb(100,100,100)";
-    ctx.fillRect(this.x,this.y,this.width,this.height);
 
-}
-
-Boat.prototype.setIndex = function(index) {
-    this.index = index;
-    this.column = this.index % nCols;
-    this.row = Math.floor(this.index / nCols);
-    this.x = tileMargin + this.column * (tileSize + tileMargin) + tileSize / 4;
-    this.y = tileMargin + this.row * (tileSize + tileMargin) + tileSize / 4;
+Boat.prototype.isClicked = function(x,y) {
+            return (x > this.x && y > this.y && x < this.x + this.width && y < this.y + this.height);
 }

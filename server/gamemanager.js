@@ -1,5 +1,7 @@
 var Game = require("./game").Game;
+var Boat = require("./boat").Boat;
 var MaskHelper = require("../shared/maskhelper.js").MaskHelper;
+var ObjectHelper = require("../shared/objecthelper.js").ObjectHelper;
 
 function GameManager(userManager) {
     this.games = new Array();
@@ -10,8 +12,32 @@ function GameManager(userManager) {
 
 GameManager.prototype.addGame = function(user) {
             var game = new Game(8, 8);
-            game.players[0].userID = user;
+            game.players[0].user = user;
             game.gameID = this.currentGameID;
+            
+            for(var i = 0; i < 2; i++) {
+                for(var j = 0; j < 5; j++) {
+                    var size = 0;
+                    var boat;
+                    switch(j) {
+                    case 0:
+                    case 1:
+                        size = 2;
+                        break;
+                    case 2:
+                    case 3:
+                        size = 3;
+                        break;
+                    case 4:
+                        size = 4;
+                        break;
+                    }
+
+                    boat = new Boat(size);
+                    boat.index = j;
+                    game.players[i].boats.push(boat) 
+                }
+            }
 
             console.log("Made game with user " + game.players[0].user.userID);
 
@@ -83,52 +109,5 @@ GameManager.prototype.findGameByID = function(gameID) {
             return null;
         }
 
-GameManager.prototype.convertGameToGameData = function(user, game) {
-            var opponent;
-            var ourboats;
-            var ourboatMask;
-            var ourshotMask;
-            var theirboats;
-            var theirboatMask;
-            var theirshotMask;
-            if(game.players[0].user.userID === user.userID) {
-                // we are user 1
-                ourboats = game.players[0].boats;
-                ourboatMask = game.players[0].boatMask;
-                ourshotMask = game.players[0].shotMask;
-
-                opponent = game.players[1].userID;
-                theirboats = game.findDestroyedboats(2);
-                theirboatMask = game.players[1].boatMask;
-                theirshotMask = game.players[1].shotMask;
-            } else {
-                // we are user 2
-                ourboats = game.players[1].boats;
-                ourboatMask = game.players[1].boatMask;
-                ourshotMask = game.players[1].shotMask;
-
-                opponent = game.players[0].userID;
-                theirboats = game.findDestroyedboats(1);
-                theirboatMask = game.players[0].boatMask;
-                theirshotMask = game.players[0].shotMask;
-            }
-            // set their boatMask to only those that we have shot
-            theirboatMask = MaskHelper.and(theirboatMask, theirshotMask);
-
-            // TODO Send our boats, our shot mask, our boat mask, their shot mask, our hit mask
-            return {
-                opponent: {
-                    userID: opponent.userID,
-                    username: opponent.username
-                },
-                gameID: game.gameID,
-                ourboats: ourboats,
-                ourboatMask: ourboatMask,
-                ourshotMask: ourshotMask,
-                theirboats: theirboats,
-                theirboatMask: theirboatMask,
-                theirshotMask: theirshotMask
-            };
-        }
 
 exports.GameManager = GameManager;
