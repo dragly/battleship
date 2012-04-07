@@ -98,7 +98,9 @@ Game.convertGameToGameData = function(user, game) {
         ourShotMask: ourShotMask,
         theirBoats: theirBoats,
         theirBoatMask: theirBoatMask,
-        theirShotMask: theirShotMask
+        theirShotMask: theirShotMask,
+        nCols: game.nCols,
+        nRows: game.nRows
     };
 }
 

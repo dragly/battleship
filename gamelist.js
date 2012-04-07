@@ -13,13 +13,13 @@ GameList.prototype.addGames = function(receivedGames) {
                     console.log("Comparing local game " + this.games[i].gameID + " with remote " + receivedGames[j].gameID);
                     if(this.games[i].gameID === receivedGames[j].gameID) {
                         console.log("We had this game already, updating");
-                        this.games[i] = Game.createGameFromData(receivedGames[j]);
+                        this.games[i] = receivedGames[j];
                         hadGameAlready = true;
                     }
                 }
                 if(!hadGameAlready) {
                     console.log("Appending a game");
-                    this.games.push(Game.createGameFromData(receivedGames[j]));
+                    this.games.push(receivedGames[j]);
                 }
             }
 

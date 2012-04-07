@@ -37,15 +37,15 @@ MaskHelper.compare = function (mask1, mask2) {
 }
 
 MaskHelper.setIndex = function (mask, tileIndex) {
-    var memberIndex = floor(TileIndex / 32);
-    var nBit = TileIndex % 32;
-    return (mask(i) | 0x1 << nBit);
+    var memberIndex = Math.floor(tileIndex / 32);
+    var nBit = tileIndex % 32;
+    mask = (mask[memberIndex] | (0x1 << nBit));
 }
 
-MaskHelper.getValueOfIndex = function (mask, TileIndex) {
-    var memberIndex = floor(TileIndex / 32);
-    var nBit = TileIndex % 32;
-    return ((mask(i) & 0x1 << nBIt) != 0);
+MaskHelper.getValueOfIndex = function (mask, tileIndex) {
+    var memberIndex = Math.floor(tileIndex / 32);
+    var nBit = tileIndex % 32;
+    return ((mask[memberIndex] & (0x1 << nBit)) != 0);
 }
 
 if(typeof exports != 'undefined') {

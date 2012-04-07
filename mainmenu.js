@@ -237,16 +237,26 @@ MainMenu.prototype.redraw = function () {
     } else if (this.menuState === MenuState.Ours) {
         this.ctx.fillText("Mine", 100, 100);
         // TODO Draw the board
-        for (var i = 0; i < this.currentGame.ourTiles.length; i++) {
-            this.currentGame.ourTiles[i].draw();
+        for(var i = 0; i < this.currentGame.nRows; i++) {
+            for (var j = 0; j < this.currentGame.nCols; j++) {
+                var index = this.currentGame.nRows * i + j;
+                var hit = MaskHelper.getValueOfIndex(this.currentGame.ourShotMask, index);
+                if(hit) {
+                    this.ctx.fillStyle = "rgb(255,0,0)";
+                } else {
+                    this.ctx.fillStyle = "rgb(0,255,0)";
+                }
+                this.ctx.fillRect(j * tileSize, i * tileSize, tileSize, tileSize);
+            }
         }
-        for (var i = 0; i < this.currentGame.ourBoats; i++) {
-            this.currentGame.ourBoats[i].draw();
+        for (var i = 0; i < this.currentGame.ourBoats.length; i++) {
+            console.log("Drawing boat " + i);
+            this.currentGame.ourBoats[i].draw(this.ctx);
         }
     } else if (this.menuState === MenuState.Theirs) {
         this.ctx.fillText("Theirs", 100, 100);
         for (var i = 0; i < this.currentGame.theirTiles.length; i++) {
-            this.currentGame.theirTiles[i].draw();
+            this.currentGame.theirTiles[i].draw(this.ctx);
         }
         // TODO draw hit boats
         for (var i = 0; i < nBoats; i++) {

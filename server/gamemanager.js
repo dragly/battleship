@@ -1,4 +1,5 @@
 var Game = require("./game").Game;
+var Boat = require("./boat").Boat;
 var MaskHelper = require("../shared/maskhelper.js").MaskHelper;
 var ObjectHelper = require("../shared/objecthelper.js").ObjectHelper;
 
@@ -13,6 +14,30 @@ GameManager.prototype.addGame = function(user) {
             var game = new Game(8, 8);
             game.players[0].user = user;
             game.gameID = this.currentGameID;
+            
+            for(var i = 0; i < 2; i++) {
+                for(var j = 0; j < 5; j++) {
+                    var size = 0;
+                    var boat;
+                    switch(j) {
+                    case 0:
+                    case 1:
+                        size = 2;
+                        break;
+                    case 2:
+                    case 3:
+                        size = 3;
+                        break;
+                    case 4:
+                        size = 4;
+                        break;
+                    }
+
+                    boat = new Boat(size);
+                    boat.index = j;
+                    game.players[i].boats.push(boat) 
+                }
+            }
 
             console.log("Made game with user " + game.players[0].user.userID);
 

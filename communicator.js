@@ -66,11 +66,7 @@ Communicator.prototype.requestRandomGame = function (user, callback) {
 
 Communicator.prototype.receivedRandomGame = function (gameData, callback) {
     console.log("Received random game!");
-    var game = new Game();
-    game.gameID = gameData.gameID;
-    // TODO Process game data
-    console.log(gameData);
-    // TODO Add error handling if no game received or we have timed out
+    var game = Game.createGameFromData(gameData)
     callback( game);
 }
 
