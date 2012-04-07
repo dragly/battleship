@@ -7,6 +7,10 @@ folder_02.source = ../../client
 folder_02.target = client
 DEPLOYMENTFOLDERS += folder_02
 
+folder_03.source = ../../shared
+folder_03.target = client
+DEPLOYMENTFOLDERS += folder_03
+
 # Additional import path used to resolve QML modules in Creator's code model
 QML_IMPORT_PATH =
 

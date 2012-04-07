@@ -47,10 +47,17 @@ GameManager.prototype.addGame = function (user) {
     return game;
 }
 
+GameManager.prototype.findWaitingGame = function (user) {
+    for( var i = 0;(i < this.waitingGame.length && i<25/*no intended crashing on my watch!*/);i++) {
+        if (!this.waitingGame[i].hasUser(user))
+            return i;
+    }
+    return null;
+}
 
 GameManager.prototype.randomGame = function (user) {
-    var game;
-    if (this.waitingGame.length < 1 || this.waitingGame[0].hasUser(user)) {
+    var game = this.findWaitingGame(user);
+    if (game === null) {
         console.log("Waiting game was empty or contained user " + user.userID + " already. Creating new random game.");
         game = this.addGame(user);
         this.waitingGame.push(game);

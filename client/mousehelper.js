@@ -5,6 +5,9 @@ function MouseHelper() {
         var totalOffsetY = 0;
         var currentElement = canvas;
 
+        if (event.targetTouches) 
+            event = event.targetTouches[0];
+
         do {
             totalOffsetX += currentElement.offsetLeft;
             totalOffsetY += currentElement.offsetTop;

@@ -85,6 +85,9 @@ MainMenu.prototype.initApplication = function () {
     this.canvas.addEventListener("mousemove", function (event) { self.canvasMouseMove(event) });
     this.canvas.addEventListener("mousedown", function (event) { self.canvasMouseDown(event) });
     this.canvas.addEventListener("mouseup", function (event) { self.canvasMouseUp(event) });
+    this.canvas.addEventListener('touchmove', function (event) { self.canvasMouseMove(event) });
+    this.canvas.addEventListener('touchstart', function (event) { self.canvasMouseDown(event) });
+    this.canvas.addEventListener('touchend', function (event) { self.canvasMouseUp(event) });
 
     // TODO setting up tilesize should be done elsewhere and not in a global var
     // set up UI stuff
