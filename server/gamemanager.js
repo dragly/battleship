@@ -10,104 +10,105 @@ function GameManager(userManager) {
     this.userManager = userManager;
 }
 
-GameManager.prototype.addGame = function(user) {
-            var game = new Game(8, 8);
-            game.players[0].user = user;
-            game.gameID = this.currentGameID;
-            
-            for(var i = 0; i < 2; i++) {
-                for(var j = 0; j < 5; j++) {
-                    var size = 0;
-                    var boat;
-                    switch(j) {
-                    case 0:
-                    case 1:
-                        size = 2;
-                        break;
-                    case 2:
-                    case 3:
-                        size = 3;
-                        break;
-                    case 4:
-                        size = 4;
-                        break;
-                    }
+GameManager.prototype.addGame = function (user) {
+    var game = new Game(8, 8);
+    game.players[0].user = user;
+    game.gameID = this.currentGameID;
 
-                    boat = new Boat(size);
-                    boat.index = j;
-                    game.players[i].boats.push(boat) 
-                }
+    for (var i = 0; i < 2; i++) {
+        for (var j = 0; j < 5; j++) {
+            var size = 0;
+            var boat;
+            switch (j) {
+                case 0:
+                case 1:
+                    size = 2;
+                    break;
+                case 2:
+                case 3:
+                    size = 3;
+                    break;
+                case 4:
+                    size = 4;
+                    break;
             }
 
-            console.log("Made game with user " + game.players[0].user.userID);
-
-            this.games.push(game);
-            this.currentGameID++;
-            return game;
+            boat = new Boat(size);
+            boat.index = j;
+            game.players[i].boats.push(boat)
         }
+    }
 
-GameManager.prototype.randomGame = function(user) {
-            var game;
-            if(this.waitingGame.length < 1 || this.waitingGame[0].hasUser(user)) {
-                console.log("Waiting game was empty or contained user " + user.userID + " already. Creating new random game.");
-                game = this.addGame(user);
-                this.waitingGame.push(game);
-            } else {
-                game = this.waitingGame[0];
-                console.log("Adding user to game " + game.gameID);
-                game.players[1].userID = user;
-                this.waitingGame.splice(0,1);
-            }
-            return game;
-        }
+    console.log("Made game with user " + game.players[0].user.userID);
+
+    this.games.push(game);
+    this.currentGameID++;
+    return game;
+}
+
+
+GameManager.prototype.randomGame = function (user) {
+    var game;
+    if (this.waitingGame.length < 1 || this.waitingGame[0].hasUser(user)) {
+        console.log("Waiting game was empty or contained user " + user.userID + " already. Creating new random game.");
+        game = this.addGame(user);
+        this.waitingGame.push(game);
+    } else {
+        game = this.waitingGame[0];
+        console.log("Adding user to game " + game.gameID);
+        game.players[1].user = user;
+        this.waitingGame.splice(0, 1);
+    }
+    return game;
+}
 
 // Return list of games for user
-GameManager.prototype.findGamesByUser = function(user) {
-            var gamesToReturn = new Array();
-            for(var i = 0; i < this.games.length; i++) {
-                var game = this.games[i];
-                if(game.hasUser(user)) {
-                    gamesToReturn.push(game);
-                }
-            }
-            return gamesToReturn;
+GameManager.prototype.findGamesByUser = function (user) {
+    var gamesToReturn = new Array();
+    for (var i = 0; i < this.games.length; i++) {
+        var game = this.games[i];
+        if (game.hasUser(user)) {
+            gamesToReturn.push(game);
         }
+    }
+    return gamesToReturn;
+}
 
 // Return list of updated games for user
-GameManager.prototype.findUpdatedGames = function(user, currentGames) {
-            var gamesToReturn = new Array();
-            var userGames = this.findGamesByUser(user);
-            for(var i = 0; i < userGames.length; i++) {
-                var game = userGames[i];
-                var clientHadGame = false;
-                for(var j = 0; j < currentGames.length; j++) {
-                    var currentGame = currentGames[j];
-                    if(game.gameID === currentGame.gameID) {
-                        clientHadGame = true;
-                        // check if user is in game and that
-                        if(game.turn > currentGame.turn) {
-                            console.log("Pushing game with newer turn");
-                            gamesToReturn.push(game);
-                        }
-                    }
-                }
-                if(!clientHadGame) {
-                    console.log("Pushing a game the client did not have");
+GameManager.prototype.findUpdatedGames = function (user, currentGames) {
+    var gamesToReturn = new Array();
+    var userGames = this.findGamesByUser(user);
+    for (var i = 0; i < userGames.length; i++) {
+        var game = userGames[i];
+        var clientHadGame = false;
+        for (var j = 0; j < currentGames.length; j++) {
+            var currentGame = currentGames[j];
+            if (game.gameID === currentGame.gameID) {
+                clientHadGame = true;
+                // check if user is in game and that
+                if (game.turn > currentGame.turn) {
+                    console.log("Pushing game with newer turn");
                     gamesToReturn.push(game);
                 }
             }
-            return gamesToReturn;
         }
+        if (!clientHadGame) {
+            console.log("Pushing a game the client did not have");
+            gamesToReturn.push(game);
+        }
+    }
+    return gamesToReturn;
+}
 
-GameManager.prototype.findGameByID = function(gameID) {
-            for(var i = 0; i < this.games.length; i++) {
-                var game = this.games[i];
-                if(game.gameID === gameID) {
-                    return game;
-                }
-            }
-            return null;
+GameManager.prototype.findGameByID = function (gameID) {
+    for (var i = 0; i < this.games.length; i++) {
+        var game = this.games[i];
+        if (game.gameID === gameID) {
+            return game;
         }
+    }
+    return null;
+}
 
 
 exports.GameManager = GameManager;
