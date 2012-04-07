@@ -25,7 +25,7 @@ function MainMenu() {
     this.mouseHelper = new MouseHelper();
     this.communicator = new Communicator(this);
     this.gameList = new GameList(this);
-    this.communicator.serverUrl = "localhost:8888";
+    this.communicator.serverUrl = "192.168.0.194:8888";
     this.menuState = MenuState.Login; // 0 - game menu, 1 - our table, 2 - their table, 3 - login user
     this.gameState = GameState.PlaceBoats; // 0 - place boats, 1 - waiting for opponent, 2 - your turn, 3 - their turn
     this.canvas = 0;

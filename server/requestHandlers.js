@@ -118,7 +118,7 @@ function placeBoats(response, postData) {
     if(game.hasUser(user)) {
         var ourBoats = new Array();
         for(var i = 0; i < receivedData.ourBoats.length; i++) {
-            var boat = new Boat();
+            var boat = new Boat(game);
             ObjectHelper.copyDataToObject(receivedData.ourBoats[i], boat, ["index", "size", "horizontal"]);
             ourBoats.push(boat);
             // TODO verify boat setup

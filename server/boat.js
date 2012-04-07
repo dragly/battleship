@@ -1,9 +1,9 @@
 var MaskHelper = require("../shared/maskhelper.js").MaskHelper;
 
-function Boat(size) {
+function Boat() {
     this.index = -1;
     this.horizontal = false;
-    this.size = size;
+    this.size = 0;
 }
 
 Boat.prototype.mask = function(nRows, nCols) {
