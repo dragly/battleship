@@ -27,8 +27,10 @@ function Game(nRows, nCols) {
         this.players[1].shotMask.push(0);
     }
 }
-Game.prototype.getIndexOfUserID = function(userID) {
-
+Game.prototype.getIndexOfUserID = function (userID) {
+    if (this.players[1].user.userID === userID)
+        return 1;
+    else return 0;
 }
 
 

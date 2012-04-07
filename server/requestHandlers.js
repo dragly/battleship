@@ -32,30 +32,41 @@ function shoot(response, postData) { //var params = { user: user.userID, key: us
     console.log("Request handler 'shoot' was called.");
     response.writeHead(200, { "Content-Type": defaultHeader });
     var data = JSON.parse(post.json);
+    var boatIsHit = false;
+    var success = false;
+    var game = gameManager.findGameByID(data.gameID);
 
-    //TODO:process shot
-    //1.check if shot was legal
-    //1.1 add to shotmask
+    var gameData = { success: success, index: data.index, boat: boatIsHit };
 
-    //game.
-    //check vs boatmask
+    //Do mandatory checks //TODO: Add auth
+    if (game !== null /*&& auth */) {
+     
+        var pI = game.getIndexOfUserID(data.user.userID);
+        var oppI = (pI === 1) ? 0 : 1;
 
-    //2.progress gamestate/remove ammo
-    //3.check if a boat was hit
-    //  3.1 If a boat was hit, call "Boat hit logic", and end game if nececarry.
-    //  3.2 send the boat element as newBoatSunk if the boat
+        if (data.user.userID === game.players[pI].user.userID /* in case it returns the p2 and it aint equal*/ 
+        && (data.index < game.nRows * game.nCols) && (data.index >= 0) && !isNaN(parseInt(data.index * 1)) /*the index is valid*/
+        && !MaskHelper.getValueOfIndex(game.players[oppI].shotMask, data.index)) {
+            //TODO: check if it was the users turn
+            success = true;
+            
+            //fire the cannons!
+            MaskHelper.setIndex(game.players[oppI].shotMask, data.index);
 
-    gameManager.findGameByID(data.gameID);
-    //fire shot if legal
+            //TODO: advance the game, and remove ammo from the user
 
-    var gameData = { success: true, index: data.index, boat: false };
+            if (MaskHelper.getValueOfIndex(game.player[oppI].boatMask, data.index)) {
+                boatIsHot = true;
+                //TODO: If a boat was hit, call "Boat hit logic", and end game if nececarry.
 
-    //var boat = boatAtIndex(data.index); //TODO, implement the following functionality.
-    //if (boat.isSunk())
-    //    gameData.newBoatSunk = boat;
+                //TODO: send the boat element as newBoatSunk if the boat is now completely covered in holes
 
-    //(gameData.success,gameData.index,gameData.boat, gameData.newBoatSunk
-    //data.gameID;
+                //TODO: implement boatAtIndex(data.index);
+               // if //TODO: is boat convered in holes function.
+                        //gameData.newBoatSunk = boat;
+            }
+        }     
+    }
     response.write(JSON.stringify(gameData));
     response.end();    
 }
