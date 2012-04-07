@@ -11,8 +11,8 @@ var GameState = {
 function GameUserData() {
     this.user = null;
     this.boats = new Array();
-    this.boatMask = new Array();
-    this.shotMask = new Array();
+    this.boatMask = null;
+    this.shotMask = null;
     this.boatsPlaced = false;
 }
 
@@ -30,13 +30,20 @@ function Game(nRows, nCols) {
     this.players[0] = new GameUserData();    
     this.players[1] = new GameUserData();
 
-    for (i = 0; i < (nRows * nCols) / 32; i++) {
-        this.players[0].boatMask.push(0);
-        this.players[1].boatMask.push(0);
-        this.players[0].shotMask.push(0);
-        this.players[1].shotMask.push(0);
+    for(var i = 0; i < this.players.length; i++) {
+        this.players[i].boatMask = this.emptyMask();
+        this.players[i].shotMask = this.emptyMask();
     }
 }
+
+Game.prototype.emptyMask = function() {
+    var mask = new Array();
+    for (var i = 0; i < (this.nRows * this.nCols) / 32; i++) {
+        mask.push(0);
+    }
+    return mask;
+}
+
 Game.prototype.getIndexOfUser = function (user) {
     if (this.players[0].user === user)
         return 0;

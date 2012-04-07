@@ -39,6 +39,7 @@ function MainMenu() {
     //    this.newRandomGameButton = new Button(this.buttonHandler, 100, 400, 200, 50, "New Random Game", function () { self.requestRandomGame() });
     this.placeBoatsButton = new Button(this.buttonHandler, 100, 400, 200, 50, "Place boats", function () { self.requestPlaceBoats() });
     this.goToGameListButton = new Button(this.buttonHandler, 100, 500, 200, 50, "Exit to Game List", function () { self.showGameList() });
+    this.switchBoardsButton = new Button(this.buttonHandler, 100, 400, 200, 50, "Switch board", function () { self.switchBoards() });
 
     // Set up JQuery mobile
     $(document).bind("mobileinit", function () {
@@ -49,6 +50,40 @@ function MainMenu() {
     });
 }
 
+MainMenu.prototype.switchBoards = function() {
+    if(this.menuState === MenuState.Theirs) {
+        this.showOurBoard();
+    } else if(this.menuState === MenuState.Ours) {
+        this.showTheirBoard();
+    }
+}
+
+MainMenu.prototype.showOurBoard = function() {
+    this.menuState = MenuState.Ours;
+    // Decide what buttons to show
+    this.buttonHandler.hideAll();
+    this.goToGameListButton.show();
+    if(this.currentGame.gameState === GameState.PlaceBoats) {
+        this.placeBoatsButton.show();
+    } else {
+        this.switchBoardsButton.show();
+    }
+
+    this.redraw();
+    $.mobile.changePage("#gamePage");
+}
+
+MainMenu.prototype.showTheirBoard = function() {
+    this.menuState = MenuState.Theirs;
+    // Decide what buttons to show
+    this.buttonHandler.hideAll();
+    this.goToGameListButton.show();
+    this.switchBoardsButton.show();
+    this.redraw();
+    $.mobile.changePage("#gamePage");
+}
+
+// TODO figure out how errors should be handled from communicator to the main menu
 MainMenu.prototype.httpError = function () {
     this.hideLoadingMessage();
     console.log("Received HTTP error!");
@@ -97,7 +132,7 @@ MainMenu.prototype.initApplication = function () {
     }
     // Set canvas to fullscreen (minus some UI stuff)
     this.ctx.canvas.width = window.innerWidth;
-    this.ctx.canvas.height = window.innerHeight - 50;
+    this.ctx.canvas.height = window.innerHeight - 5;
 }
 
 MainMenu.prototype.showLoginScreen = function () {
@@ -140,17 +175,8 @@ MainMenu.prototype.showGame = function (game) {
     // TODO implement this
             console.log("Showing game with ID " + game.gameID + " and game state " + game.gameState);
     this.currentGame = game;
-    this.menuState = MenuState.Ours;
 
-    this.buttonHandler.hideAll();
-    this.goToGameListButton.show();
-
-    if(this.currentGame.gameState === GameState.PlaceBoats) {
-        this.placeBoatsButton.show();
-    }
-
-    this.redraw();
-    $.mobile.changePage("#gamePage");
+    this.showOurBoard();
 }
 
 MainMenu.prototype.requestShootAtTile = function (index) {
@@ -263,14 +289,18 @@ MainMenu.prototype.redraw = function () {
     this.clear();
 
     if (this.menuState === MenuState.Ours) {
-        this.ctx.fillText("Mine", 100, 100);
         // TODO Draw the board
         for (var i = 0; i < this.currentGame.nRows; i++) {
             for (var j = 0; j < this.currentGame.nCols; j++) {
                 var index = this.currentGame.nRows * i + j;
-                var hit = MaskHelper.getValueOfIndex(this.currentGame.ourShotMask, index);
-                if (hit) {
-                    this.ctx.fillStyle = "rgb(255,0,0)";
+                var hasHit = MaskHelper.getValueOfIndex(this.currentGame.ourShotMask, index);
+                var hasBoat = MaskHelper.getValueOfIndex(this.currentGame.ourBoatMask, index);
+                if (hasHit) {
+                    if(hasBoat) {
+                        this.ctx.fillStyle = "rgb(255,255,0)";
+                    } else {
+                        this.ctx.fillStyle = "rgb(255,0,0)";
+                    }
                 } else {
                     this.ctx.fillStyle = "rgb(0,255,0)";
                 }
@@ -280,15 +310,32 @@ MainMenu.prototype.redraw = function () {
         for (var i = 0; i < this.currentGame.ourBoats.length; i++) {
             this.currentGame.ourBoats[i].draw(this.ctx);
         }
+        this.ctx.fillStyle = "rgb(255,0,0)";
+        this.ctx.fillText("Mine", 10, 20);
     } else if (this.menuState === MenuState.Theirs) {
-        this.ctx.fillText("Theirs", 100, 100);
-        for (var i = 0; i < this.currentGame.theirTiles.length; i++) {
-            this.currentGame.theirTiles[i].draw(this.ctx);
+        // TODO Draw the board
+        for (var i = 0; i < this.currentGame.nRows; i++) {
+            for (var j = 0; j < this.currentGame.nCols; j++) {
+                var index = this.currentGame.nRows * i + j;
+                var hasHit = MaskHelper.getValueOfIndex(this.currentGame.theirShotMask, index);
+                var hasBoat = MaskHelper.getValueOfIndex(this.currentGame.theirBoatMask, index);
+                if (hasHit) {
+                    if(hasBoat) {
+                        this.ctx.fillStyle = "rgb(255,255,0)";
+                    } else {
+                        this.ctx.fillStyle = "rgb(255,0,0)";
+                    }
+                } else {
+                    this.ctx.fillStyle = "rgb(0,255,0)";
+                }
+                this.ctx.fillRect(j * tileSize, i * tileSize, tileSize, tileSize);
+            }
         }
-        // TODO draw hit boats
-        for (var i = 0; i < nBoats; i++) {
-            //                        theirboats[i].draw();
+        for (var i = 0; i < this.currentGame.theirBoats.length; i++) {
+            this.currentGame.theirBoats[i].draw(this.ctx);
         }
+        this.ctx.fillStyle = "rgb(255,0,0)";
+        this.ctx.fillText("Theirs", 10, 20);
     } else {
         console.log("WARNING: Unknown menu state!");
     }
