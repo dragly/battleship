@@ -47,7 +47,7 @@ GameManager.prototype.addGame = function (user) {
 }
 
 GameManager.prototype.findWaitingGame = function (user) {
-    for( var i = 0;i < this.waitingGame.length;i++) {
+    for( var i = 0;(i < this.waitingGame.length && i<25/*no intended crashing on my watch!*/);i++) {
         if (!this.waitingGame[i].hasUser(user))
             return i;
     }
