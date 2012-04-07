@@ -33,12 +33,18 @@ Communicator.prototype.ajaxCall = function(url,callback, data) {
 Communicator.prototype.requestPlaceBoats = function (user, game, ourBoats, callback) {
     var self = this;
     var params = { user: user.authData(), ourBoats: ourBoats, gameID: game.gameID };
-    this.ajaxCall("http://" + this.serverUrl + "/placeBoats", function(response) { self.receivedNewUser(response, callback); }, params);
+    this.ajaxCall("http://" + this.serverUrl + "/placeBoats", function(response) { self.receivedPlaceBoats(response, callback); }, params);
 }
 
 Communicator.prototype.receivedPlaceBoats = function (receivedData, callback) {
     //TODO Error handling if boats could not be placed
-    callback();
+    if(receivedData.error === undefined) {
+        console.log("No error");
+    }
+
+    console.log("Received data from game after placing boats");
+    var game = Game.createGameFromData(receivedData)
+    callback(game);
 }
 
 Communicator.prototype.requestNewUser = function (callback) {
