@@ -126,8 +126,10 @@ function placeBoats(response, postData) {
 
         game.placeBoats(user, receivedData.ourBoats);
     } // TODO Failure of finding user in game
-    var status = {status: "OK"};
-    response.write(JSON.stringify(status));
+    // Send the game data back to the client
+    var gameData = Game.convertGameToGameData(user, game);
+    console.log("Writing back game data " + JSON.stringify(gameData));
+    response.write(JSON.stringify(gameData));
     response.end();
 }
 
