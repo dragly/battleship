@@ -59,7 +59,6 @@ Game.prototype.findDestroyedBoats = function(playerIndex) {
             var hitBoats = new Array();
             for(var i = 0; i < boats.length; i++) {
                 var boat = boats[i];
-                console.log("Boat looks like:\n" + JSON.stringify(boat));
                 var boatHitMask = MaskHelper.and(boat.mask(this.nRows,this.nCols), shotMask);
                 if (MaskHelper.compare(boatHitMask, boat.mask(this.nRows, this.nCols))) {
                     hitBoats.push(boat);

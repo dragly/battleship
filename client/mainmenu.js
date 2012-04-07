@@ -27,13 +27,15 @@ function MainMenu() {
     this.user = null;
     this.isDragging = null;
     this.currentGame = 0;
+    this.lastPosX = 0;
+    this.lastPosY = 0;
 
     //Buttons
     var self = this;
     this.buttonHandler = new ButtonHandler();
 
-//    this.newUserButton = new Button(this.buttonHandler, 100, 300, 200, 50, "Create new user", function () { self.requestNewUser() }); // <3 jallascript
-//    this.newRandomGameButton = new Button(this.buttonHandler, 100, 400, 200, 50, "New Random Game", function () { self.requestRandomGame() });
+    //    this.newUserButton = new Button(this.buttonHandler, 100, 300, 200, 50, "Create new user", function () { self.requestNewUser() }); // <3 jallascript
+    //    this.newRandomGameButton = new Button(this.buttonHandler, 100, 400, 200, 50, "New Random Game", function () { self.requestRandomGame() });
     this.placeBoatsButton = new Button(this.buttonHandler, 100, 400, 200, 50, "Place boats", function () { self.requestPlaceBoats() });
     this.goToGameListButton = new Button(this.buttonHandler, 100, 500, 200, 50, "Exit to Game List", function () { self.showGameList() });
 
@@ -49,7 +51,7 @@ function MainMenu() {
 MainMenu.prototype.httpError = function () {
     this.hideLoadingMessage();
     console.log("Received HTTP error!");
-//    this.communicator.stopAll();
+    //    this.communicator.stopAll();
     alert("Could not connect to the game server. Please try again later.");
 }
 
@@ -76,12 +78,13 @@ MainMenu.prototype.initApplication = function () {
     this.ctx = this.canvas.getContext("2d");
 
     var self = this;
+
     this.canvas.addEventListener("mousemove", function (event) { self.canvasMouseMove(event) });
     this.canvas.addEventListener("mousedown", function (event) { self.canvasMouseDown(event) });
     this.canvas.addEventListener("mouseup", function (event) { self.canvasMouseUp(event) });
-    this.canvas.addEventListener('touchmove', function (event) { self.canvasMouseMove(event) });
-    this.canvas.addEventListener('touchstart', function (event) { self.canvasMouseDown(event) });
-    this.canvas.addEventListener('touchend', function (event) { self.canvasMouseUp(event) });
+    this.canvas.addEventListener('touchmove', function (event) { event.preventDefault(); self.canvasMouseMove(event); });
+    this.canvas.addEventListener('touchstart', function (event) { event.preventDefault(); self.canvasMouseDown(event); });
+    this.canvas.addEventListener('touchend', function (event) { event.preventDefault(); self.canvasMouseUp(event); });
 
     // TODO setting up tilesize should be done elsewhere and not in a global var
     // set up UI stuff
@@ -101,7 +104,7 @@ MainMenu.prototype.showLoginScreen = function () {
     this.menuState = MenuState.Login;
 
     this.buttonHandler.hideAll();
-//    this.newUserButton.show();
+    //    this.newUserButton.show();
 
     this.redraw();
     $.mobile.changePage("#loginPage");
@@ -112,7 +115,7 @@ MainMenu.prototype.showGameList = function () {
     this.requestGameList();
 
     this.buttonHandler.hideAll();
-//    this.newRandomGameButton.show();
+    //    this.newRandomGameButton.show();
 
     this.redraw();
     $.mobile.changePage("#gameListPage");
@@ -251,11 +254,11 @@ MainMenu.prototype.redraw = function () {
     if (this.menuState === MenuState.Ours) {
         this.ctx.fillText("Mine", 100, 100);
         // TODO Draw the board
-        for(var i = 0; i < this.currentGame.nRows; i++) {
+        for (var i = 0; i < this.currentGame.nRows; i++) {
             for (var j = 0; j < this.currentGame.nCols; j++) {
                 var index = this.currentGame.nRows * i + j;
                 var hit = MaskHelper.getValueOfIndex(this.currentGame.ourShotMask, index);
-                if(hit) {
+                if (hit) {
                     this.ctx.fillStyle = "rgb(255,0,0)";
                 } else {
                     this.ctx.fillStyle = "rgb(0,255,0)";
@@ -294,6 +297,8 @@ MainMenu.prototype.redraw = function () {
 // *********** MOUSE HANDLING ********** //
 MainMenu.prototype.canvasMouseMove = function (e) {
     var mousePos = this.mouseHelper.getCursorPosition(e, this.canvas);
+    this.lastPosX = mousePos.x;
+    this.lastPosY = mousePos.y;
 
     if (this.isDragging !== null) {
         var boat = this.isDragging;
@@ -301,13 +306,14 @@ MainMenu.prototype.canvasMouseMove = function (e) {
         boat.y = mousePos.y - boat.height / 2;
         this.redraw();
     }
+    return false;
 }
 
 MainMenu.prototype.canvasMouseUp = function (e) {
 
-    var mousePos = this.mouseHelper.getCursorPosition(e, this.canvas);
-    var x = mousePos.x;
-    var y = mousePos.y;
+    //var mousePos = this.mouseHelper.getCursorPosition(e, this.canvas); //This aint passed on touch phones
+    var x = this.lastPosX;
+    var y = this.lastPosY;
 
     if (this.menuState === MenuState.Ours || this.menuState === MenuState.Theirs) {
         if (this.isDragging !== null) {
@@ -316,7 +322,7 @@ MainMenu.prototype.canvasMouseUp = function (e) {
             var bestFit = 99999999;
             var bestFitIndex = 0;
             for (var i = 0; i < this.currentGame.nRows; i++) {
-                for(var j = 0; j < this.currentGame.nCols; j++) {
+                for (var j = 0; j < this.currentGame.nCols; j++) {
                     var index = i * this.currentGame.nCols + j;
                     var diffX = j * tileSize - x + boat.width / 2;
                     var diffY = i * tileSize - y + boat.height / 2;
@@ -333,10 +339,13 @@ MainMenu.prototype.canvasMouseUp = function (e) {
     this.buttonHandler.mouseReleased(x, y);
     this.isDragging = null;
     this.redraw();
+    return false;
 }
 
 MainMenu.prototype.canvasMouseDown = function (e) {
     var mousePos = this.mouseHelper.getCursorPosition(e, this.canvas);
+    this.lastPosX = mousePos.x;
+    this.lastPosY = mousePos.y;
 
     this.buttonHandler.mousePressed(mousePos.x, mousePos.y);
 
@@ -350,4 +359,5 @@ MainMenu.prototype.canvasMouseDown = function (e) {
             }
         }
     }
+    return false;
 }

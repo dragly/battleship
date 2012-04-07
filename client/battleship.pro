@@ -21,4 +21,4 @@ OTHER_FILES += \
     ../server/gamemanager.js \
     ../server/usermanager.js \
     gamelist.js \
-    shared/maskhelper.js
+    ../shared/maskhelper.js
