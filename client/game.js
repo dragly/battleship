@@ -1,3 +1,12 @@
+var GameState = {
+    PlaceBoats: 0,
+    Waiting: 1,
+    OurTurn: 2,
+    TheirTurn: 3,
+    WeWon: 4,
+    TheyWon: 5
+}
+
 function Game() {
     this.gameID = 0;
     this.nRows = 8;
@@ -11,6 +20,8 @@ function Game() {
     this.theirBoatMask = new Array();
     this.theirShotMask = new Array();
     this.opponent = null;
+
+    this.gameState = GameState.PlaceBoats;
 }
 
 // Create a game based on game data from server
@@ -38,7 +49,7 @@ Game.createGameFromData = function(gameData) {
         boat.updatePosition(gameData.nCols);
         game.theirBoats.push(boat);
     }
-    ObjectHelper.copyDataToObject(gameData, game, ["ourBoatMask","ourShotMask","theirBoatMask","theirShotMask","nCols","nRows"]);
+    ObjectHelper.copyDataToObject(gameData, game, ["ourBoatMask","ourShotMask","theirBoatMask","theirShotMask","nCols","nRows","gameState"]);
     
     return game;
 }

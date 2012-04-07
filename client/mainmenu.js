@@ -8,12 +8,6 @@ var tileMargin = 0;
 
 var games = new Array();
 
-var GameState = {
-    PlaceBoats: 0,
-    Waiting: 1,
-    OurTurn: 2,
-    TheirTurn: 3
-}
 var MenuState = {
     List: 0,
     Ours: 1,
@@ -25,9 +19,9 @@ function MainMenu() {
     this.mouseHelper = new MouseHelper();
     this.communicator = new Communicator(this);
     this.gameList = new GameList(this);
-    this.communicator.serverUrl = "192.168.0.194:8888";
+    this.communicator.serverUrl = "localhost:8888";
     this.menuState = MenuState.Login; // 0 - game menu, 1 - our table, 2 - their table, 3 - login user
-    this.gameState = GameState.PlaceBoats; // 0 - place boats, 1 - waiting for opponent, 2 - your turn, 3 - their turn
+//    this.gameState = GameState.PlaceBoats; // 0 - place boats, 1 - waiting for opponent, 2 - your turn, 3 - their turn
     this.canvas = 0;
     this.ctx = 0;
     this.user = null;
@@ -137,13 +131,16 @@ MainMenu.prototype.showGameByID = function (gameID) {
 
 MainMenu.prototype.showGame = function (game) {
     // TODO implement this
-    console.log("Showing game with ID " + game.gameID);
+            console.log("Showing game with ID " + game.gameID + " and game state " + game.gameState);
     this.currentGame = game;
     this.menuState = MenuState.Ours;
 
     this.buttonHandler.hideAll();
     this.goToGameListButton.show();
-    this.placeBoatsButton.show();
+
+    if(this.currentGame.gameState === GameState.PlaceBoats) {
+        this.placeBoatsButton.show();
+    }
 
     this.redraw();
     $.mobile.changePage("#gamePage");
@@ -174,16 +171,23 @@ MainMenu.prototype.recievedShootAtTile = function (success, index, boat, newBoat
 }
 
 MainMenu.prototype.requestPlaceBoats = function () {
-            this.showLoadingMessage("Checking boat placements...");
-            var self = this;
-            // TODO add this to the communicator class
-            this.communicator.requestPlaceBoats(this.user, this.currentGame, this.currentGame.ourBoats, function () { self.receivedPlaceBoats() });
+    if(this.currentGame.gameState === GameState.PlaceBoats) {
+        this.showLoadingMessage("Checking boat placements...");
+        var self = this;
+        // TODO add this to the communicator class
+        this.communicator.requestPlaceBoats(this.user, this.currentGame, this.currentGame.ourBoats, function (game) { self.receivedPlaceBoats(game) });
+    } else {
+        console.log("WARNING: Tried to call place boats without PlaceBoats game state.")
+    }
 }
 
-MainMenu.prototype.receivedPlaceBoats = function () {
+MainMenu.prototype.receivedPlaceBoats = function (game) {
     this.hideLoadingMessage();
     console.log("Boats were placed successfully!");
-            // TODO Show waiting for opponent
+    this.gameList.addGames([game]);
+    this.currentGame = game;
+    this.showGame(this.currentGame);
+    // TODO Show waiting for opponent
 }
 
 MainMenu.prototype.requestNewUser = function () {
@@ -277,7 +281,7 @@ MainMenu.prototype.redraw = function () {
 
     this.buttonHandler.draw(this.ctx);
 
-    this.ctx.fillText("GameState: " + this.gameState, this.canvas.width - 100, 10);
+    this.ctx.fillText("GameState: " + this.currentGame.gameState, this.canvas.width - 100, 10);
 
     //this.ctx.fillStyle = "rgb(200,50,0)";
     //this.ctx.fillRect(100, this.canvas.height - 150, 200, 50);
@@ -336,7 +340,7 @@ MainMenu.prototype.canvasMouseDown = function (e) {
 
     this.buttonHandler.mousePressed(mousePos.x, mousePos.y);
 
-    if (this.menuState === MenuState.Ours && this.gameState === GameState.PlaceBoats) {
+    if (this.menuState === MenuState.Ours && this.currentGame.gameState === GameState.PlaceBoats) {
         console.log("spotted " + this.currentGame.ourBoats.length + "boats. With mouse coord: " + mousePos.x + "," + mousePos.y);
         for (var i = 0; i < this.currentGame.ourBoats.length; i++) {
             var boat = this.currentGame.ourBoats[i];

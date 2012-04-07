@@ -1,25 +1,32 @@
 var MaskHelper = require("../shared/maskhelper.js").MaskHelper;
 var ObjectHelper = require("../shared/objecthelper.js").ObjectHelper;
 
+var GameState = {
+    PlaceBoats: 0,
+    Waiting: 1,
+    OurTurn: 2,
+    TheirTurn: 3
+}
+
 function GameUserData() {
-    this.user = 0;
+    this.user = null;
     this.boats = new Array();
     this.boatMask = new Array();
     this.shotMask = new Array();
+    this.boatsPlaced = false;
 }
 
 function Game(nRows, nCols) {
     this.gameID = "";
     this.turn = 0;
-    this.currentPlayer = 0;
+    this.currentPlayer = null;
     this.nRows = nRows;
     this.nCols = nCols;
     this.user = new Array();
     
     this.players = new Array();
     this.players[0] = new GameUserData();    
-    this.players[1] = new GameUserData();    
-
+    this.players[1] = new GameUserData();
 
     for (i = 0; i < (nRows * nCols) / 32; i++) {
         this.players[0].boatMask.push(0);
@@ -28,34 +35,31 @@ function Game(nRows, nCols) {
         this.players[1].shotMask.push(0);
     }
 }
-Game.prototype.getIndexOfUserID = function (userID) {
-    if (this.players[1].user.userID === userID)
-        return 1;
-    else return 0;
+Game.prototype.getIndexOfUser = function (user) {
+    if (this.players[0].user === user)
+        return 0;
+    else return 1;
 }
 
 
 Game.prototype.hasUser = function (user) {
-    if (user.userID === this.players[0].user.userID || user.userID === this.players[1].user.userID) {
+    if (user === this.players[0].user || user === this.players[1].user) {
         return true;
     } else {
         return false;
     }
 }
 
-Game.prototype.placeBoats = function(user, ourBoats) {
-            var playerIndex = this.getIndexOfUserID(user.userID);
-            this.players[playerIndex].boats = ourBoats;
-        }
-
 Game.prototype.findDestroyedBoats = function(playerIndex) {
             var boats;
             var shotMask;
+            console.log("Checking destroyed boats against " + this.players[playerIndex].boats.length + " boats");
             boats = this.players[playerIndex].boats;
             shotMask = this.players[playerIndex].shotMask;
             var hitBoats = new Array();
             for(var i = 0; i < boats.length; i++) {
                 var boat = boats[i];
+                console.log("Boat looks like:\n" + JSON.stringify(boat));
                 var boatHitMask = MaskHelper.and(boat.mask(this.nRows,this.nCols), shotMask);
                 if (MaskHelper.compare(boatHitMask, boat.mask(this.nRows, this.nCols))) {
                     hitBoats.push(boat);
@@ -66,12 +70,6 @@ Game.prototype.findDestroyedBoats = function(playerIndex) {
         
 Game.convertGameToGameData = function(user, game) {
     var opponent = {};
-    var ourBoats;
-    var ourBoatMask;
-    var ourShotMask;
-    var theirBoats;
-    var theirBoatMask;
-    var theirShotMask;
     
     var ourIndex;
     var theirIndex;
@@ -85,29 +83,47 @@ Game.convertGameToGameData = function(user, game) {
         theirIndex = 0;
         // we are user 1
     }
-    ourBoats = game.players[ourIndex].boats;
-    ourBoatMask = game.players[ourIndex].boatMask;
-    ourShotMask = game.players[ourIndex].shotMask;
 
-    ObjectHelper.copyDataToObject(game.players[theirIndex].user, opponent, ["userID", "username"]);
-    theirBoats = game.findDestroyedBoats(theirIndex);
-    theirBoatMask = game.players[theirIndex].boatMask;
-    theirShotMask = game.players[theirIndex].shotMask;
-    // set their boatMask to only those that we have shot
-    theirBoatMask = MaskHelper.and(theirBoatMask, theirShotMask);
+    var ourPlayer = game.players[ourIndex];
+    var theirPlayer = game.players[theirIndex];
+
+    if(theirPlayer.user !== null) {
+        ObjectHelper.copyDataToObject(theirPlayer.user, opponent, ["userID", "username"]);
+    }
+
+    // Find the gamestate from this users view
+    var gameState;
+    if(!ourPlayer.boatsPlaced) {
+        // Come on, place your boats already!
+        gameState = GameState.PlaceBoats;
+    } else if(theirPlayer.user === null) {
+        // No other user has joined, we are waiting.
+        gameState = GameState.Waiting;
+    } else if(game.currentPlayer === ourPlayer.user && !theirPlayer.boatsPlaced) {
+        // We are the current player and they have placed boats
+        gameState = GameState.OurTurn;
+    } else {
+        // They are the current player and we have placed boats, or they have not placed boats yet
+        gameState = GameState.TheirTurn;
+    }
 
     // TODO Send our boats, our shot mask, our boat mask, their shot mask, our hit mask
     return {
         opponent: opponent,
         gameID: game.gameID,
-        ourBoats: ourBoats,
-        ourBoatMask: ourBoatMask,
-        ourShotMask: ourShotMask,
-        theirBoats: theirBoats,
-        theirBoatMask: theirBoatMask,
-        theirShotMask: theirShotMask,
+        ourBoats: ourPlayer.boats,
+        ourBoatMask: ourPlayer.boatMask,
+        ourShotMask: ourPlayer.shotMask,
+//        ourBoatsPlaced: ourPlayer.boatsPlaced,
+        theirBoats: game.findDestroyedBoats(theirIndex),
+        // set their boatMask to only those that we have shot
+        theirBoatMask: MaskHelper.and(theirPlayer.boatMask, theirPlayer.shotMask),
+        theirShotMask: theirPlayer.shotMask,
+//        theirBoatsPlaced: theirPlayer.boatsPlaced,
         nCols: game.nCols,
-        nRows: game.nRows
+        nRows: game.nRows,
+        gameState: gameState,
+        turn: game.turn
     };
 }
 

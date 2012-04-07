@@ -39,12 +39,14 @@ function shoot(response, postData) { //var params = { user: user.userID, key: us
     var gameData = { success: false, index: data.index, boat: false };
 
     //Do mandatory checks //TODO: Add auth
+
+    var user = userManager.findUserByID(data.user.userID);
     if (game !== null /*&& auth */) {
      
-        var pI = game.getIndexOfUserID(data.user.userID);
+        var pI = game.getIndexOfUser(user);
         var oppI = (pI === 1) ? 0 : 1;
 
-        if (data.user.userID === game.players[pI].user.userID /* in case it returns the p2 and it aint equal*/ 
+        if (user === game.players[pI].user /* in case it returns the p2 and it aint equal*/
         && (data.index < game.nRows * game.nCols) && (data.index >= 0) && !isNaN(parseInt(data.index * 1)) /*the index is valid*/
         && !MaskHelper.getValueOfIndex(game.players[oppI].shotMask, data.index)) {
             //TODO: check if it was the users turn (and alt. ammo.
@@ -116,15 +118,18 @@ function placeBoats(response, postData) {
     }
     var game = gameManager.findGameByID(receivedData.gameID);
     if(game.hasUser(user)) {
-        var ourBoats = new Array();
+        var playerIndex = game.getIndexOfUser(user);
+        var player = game.players[playerIndex];
+        // TODO validate that the length of the boat array is the same
         for(var i = 0; i < receivedData.ourBoats.length; i++) {
-            var boat = new Boat(game);
-            ObjectHelper.copyDataToObject(receivedData.ourBoats[i], boat, ["index", "size", "horizontal"]);
-            ourBoats.push(boat);
-            // TODO verify boat setup
+            ObjectHelper.copyDataToObject(receivedData.ourBoats[i], player.boats[i], ["index", "size", "horizontal"]);
         }
-
-        game.placeBoats(user, receivedData.ourBoats);
+        // TODO validate new boat positions
+        var validSetup = true;
+        if(validSetup) {
+            game.turn += 1;
+            player.boatsPlaced = true;
+        }
     } // TODO Failure of finding user in game
     // Send the game data back to the client
     var gameData = Game.convertGameToGameData(user, game);
@@ -144,9 +149,9 @@ function status(response, postData) {
     console.log("Request handler 'start' was called.");
     response.writeHead(200, {"Content-Type": defaultHeader});
     response.write("Users (test)\n\n");
-    response.write(JSON.stringify(users) + "\n");
+    response.write(JSON.stringify(userManager.users) + "\n");
     response.write("Games\n\n");
-    response.write(JSON.stringify(games) + "\n");
+    response.write(JSON.stringify(gameManager.games) + "\n");
     response.end();
 }
 
