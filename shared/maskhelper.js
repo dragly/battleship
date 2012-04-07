@@ -39,7 +39,7 @@ MaskHelper.compare = function (mask1, mask2) {
 MaskHelper.setIndex = function (mask, tileIndex) {
     var memberIndex = Math.floor(tileIndex / 32);
     var nBit = tileIndex % 32;
-    mask = (mask[memberIndex] | (0x1 << nBit));
+    mask[memberIndex] = (mask[memberIndex] | (0x1 << nBit));
 }
 
 MaskHelper.getValueOfIndex = function (mask, tileIndex) {

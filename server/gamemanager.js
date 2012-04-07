@@ -14,6 +14,7 @@ GameManager.prototype.addGame = function (user) {
     var game = new Game(8, 8);
     game.players[0].user = user;
     game.gameID = this.currentGameID;
+    game.currentPlayer = user;
 
     for (var i = 0; i < 2; i++) {
         for (var j = 0; j < 5; j++) {
@@ -33,7 +34,7 @@ GameManager.prototype.addGame = function (user) {
                     break;
             }
 
-            boat = new Boat(game);
+            boat = new Boat();
             boat.index = j;
             boat.size = size;
             game.players[i].boats.push(boat)

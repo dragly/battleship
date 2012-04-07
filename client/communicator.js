@@ -3,7 +3,10 @@ function Communicator(mainMenu) {
     this.mainMenu = mainMenu;
 }
 
-Communicator.prototype.errorHandler = function(request,status,err) {
+Communicator.prototype.errorHandler = function (request, status, err) {
+
+    mainMenu.hideLoadingMessage();
+
     //handle timeout here, do a popup or smth fancy!
     if (status == "timeout") {
         console.log("ERROR 408: Request timed out!");
@@ -63,14 +66,19 @@ Communicator.prototype.receivedNewUser = function (receivedUserData, callback) {
 }
 
 Communicator.prototype.recievedShootTile = function (gameData, callback) {
-    var self = this;
-    callback(gameData.success,gameData.index,gameData.boat, gameData.newBoatSunk);
+    mainMenu.hideLoadingMessage();
+
+    //handle gamestate
+    if (gameData.success)
+        callback(gameData.index, gameData.boat, gameData.remainingShots, gameData.newBoatSunk);
+    else 
+        console.log("Error: Illegal shoot action!");
 }
 
 
 Communicator.prototype.requestShootTile = function (user, game, index, callback) {
     var self = this;
-            var params = { user: user.authData(), gameID: game.gameID, tile: index };
+    var params = { user: user.authData(), gameID: game.gameID, tile: index };
     this.ajaxCall("http://" + this.serverUrl + "/shoot", function (response) { self.receivedShootTile(response, callback); }, params);
 }
 

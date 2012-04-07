@@ -8,11 +8,13 @@ Rectangle {
     WebView {
         anchors.fill: parent
         url: "../../client/client/index.html"
+//        url: "http://ocanvas.org/demos/2"
         onLoadFinished: {
             console.log("Loaded!")
         }
         onLoadFailed: {
             console.log("Error!")
         }
+        pressGrabTime: 0
     }
 }
