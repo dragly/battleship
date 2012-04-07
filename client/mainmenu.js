@@ -282,9 +282,14 @@ MainMenu.prototype.redraw = function () {
         for (var i = 0; i < this.currentGame.nRows; i++) {
             for (var j = 0; j < this.currentGame.nCols; j++) {
                 var index = this.currentGame.nRows * i + j;
-                var hit = MaskHelper.getValueOfIndex(this.currentGame.ourShotMask, index);
-                if (hit) {
-                    this.ctx.fillStyle = "rgb(255,0,0)";
+                var hasHit = MaskHelper.getValueOfIndex(this.currentGame.ourShotMask, index);
+                var hasBoat = MaskHelper.getValueOfIndex(this.currentGame.ourBoatMask, index);
+                if (hasHit) {
+                    if(hasBoat) {
+                        this.ctx.fillStyle = "rgb(255,255,0)";
+                    } else {
+                        this.ctx.fillStyle = "rgb(255,0,0)";
+                    }
                 } else {
                     this.ctx.fillStyle = "rgb(0,255,0)";
                 }
@@ -301,9 +306,14 @@ MainMenu.prototype.redraw = function () {
         for (var i = 0; i < this.currentGame.nRows; i++) {
             for (var j = 0; j < this.currentGame.nCols; j++) {
                 var index = this.currentGame.nRows * i + j;
-                var hit = MaskHelper.getValueOfIndex(this.currentGame.theirShotMask, index);
-                if (hit) {
-                    this.ctx.fillStyle = "rgb(255,0,0)";
+                var hasHit = MaskHelper.getValueOfIndex(this.currentGame.theirShotMask, index);
+                var hasBoat = MaskHelper.getValueOfIndex(this.currentGame.theirBoatMask, index);
+                if (hasHit) {
+                    if(hasBoat) {
+                        this.ctx.fillStyle = "rgb(255,255,0)";
+                    } else {
+                        this.ctx.fillStyle = "rgb(255,0,0)";
+                    }
                 } else {
                     this.ctx.fillStyle = "rgb(0,255,0)";
                 }

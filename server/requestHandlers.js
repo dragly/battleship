@@ -6,6 +6,7 @@ var Game = require("./game").Game;
 var Boat = require("./boat").Boat;
 var User = require("./user").User;
 var ObjectHelper = require("../shared/objecthelper").ObjectHelper;
+var MaskHelper= require("../shared/maskhelper").MaskHelper;
 
 var defaultHeader = "text/plain\nAccess-Control-Allow-Origin: *";
 
@@ -120,10 +121,14 @@ function placeBoats(response, postData) {
     if(game.hasUser(user)) {
         var playerIndex = game.getIndexOfUser(user);
         var player = game.players[playerIndex];
+        player.boatMask = game.emptyMask();
         // TODO validate that the length of the boat array is the same
         for(var i = 0; i < receivedData.ourBoats.length; i++) {
-            ObjectHelper.copyDataToObject(receivedData.ourBoats[i], player.boats[i], ["index", "size", "horizontal"]);
+            var boat = player.boats[i];
+            ObjectHelper.copyDataToObject(receivedData.ourBoats[i], boat, ["index", "size", "horizontal"]);
+            player.boatMask = MaskHelper.or(player.boatMask, boat.mask(game.nRows, game.nCols));
         }
+        console.log("Boat mask is now " + player.boatMask);
         // TODO validate new boat positions
         var validSetup = true;
         if(validSetup) {
