@@ -40,6 +40,7 @@ function MainMenu() {
 
 //    this.newUserButton = new Button(this.buttonHandler, 100, 300, 200, 50, "Create new user", function () { self.requestNewUser() }); // <3 jallascript
 //    this.newRandomGameButton = new Button(this.buttonHandler, 100, 400, 200, 50, "New Random Game", function () { self.requestRandomGame() });
+    this.placeBoatsButton = new Button(this.buttonHandler, 100, 400, 200, 50, "Place boats", function () { self.requestPlaceBoats() });
     this.goToGameListButton = new Button(this.buttonHandler, 100, 500, 200, 50, "Exit to Game List", function () { self.showGameList() });
 
     // Set up JQuery mobile
@@ -139,6 +140,7 @@ MainMenu.prototype.showGame = function (game) {
 
     this.buttonHandler.hideAll();
     this.goToGameListButton.show();
+    this.placeBoatsButton.show();
 
     this.redraw();
     $.mobile.changePage("#gamePage");
@@ -168,11 +170,24 @@ MainMenu.prototype.recievedShootAtTile = function (success, index, boat, newBoat
     //TODO: remove one ammo or complete turn if we're out of ammo
 }
 
+MainMenu.prototype.requestPlaceBoats = function () {
+            this.showLoadingMessage("Checking boat placements...");
+            var self = this;
+            // TODO add this to the communicator class
+            this.communicator.requestPlaceBoats(this.user, this.currentGame, this.currentGame.ourBoats, function () { self.receivedPlaceBoats() });
+}
+
+MainMenu.prototype.receivedPlaceBoats = function () {
+    this.hideLoadingMessage();
+    console.log("Boats were placed successfully!");
+            // TODO Show waiting for opponent
+}
+
 MainMenu.prototype.requestNewUser = function () {
     this.showLoadingMessage("Connecting to server...");
     var self = this;
     // TODO add this to the communicator class
-    this.communicator.requestNewUser(function (statusCode, user) { self.receivedNewUser(statusCode, user) });
+    this.communicator.requestNewUser(function (user) { self.receivedNewUser(user) });
 }
 
 MainMenu.prototype.receivedNewUser = function (user) {

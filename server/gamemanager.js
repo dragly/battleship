@@ -56,7 +56,7 @@ GameManager.prototype.randomGame = function(user) {
                 game = this.waitingGame[0];
                 console.log("Adding user to game " + game.gameID);
                 game.players[1].userID = user;
-                this.waitingGame.pop();
+                this.waitingGame.splice(0,1);
             }
             return game;
         }

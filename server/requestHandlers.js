@@ -5,6 +5,7 @@ var UserManager = require("./usermanager").UserManager;
 var Game = require("./game").Game;
 var Boat = require("./boat").Boat;
 var User = require("./user").User;
+var ObjectHelper = require("../shared/objecthelper").ObjectHelper;
 
 var defaultHeader = "text/plain\nAccess-Control-Allow-Origin: *";
 
@@ -100,7 +101,33 @@ function randomGame(response, postData) {
 function placeBoats(response, postData) {
     console.log("Request handler 'placeBoats' was called.");
     response.writeHead(200, {"Content-Type": defaultHeader});
-    response.write("Return GameState!");
+
+    //var post = querystring.parse(postData);
+    var receivedData = JSON.parse(postData);
+    var receivedUser = receivedData.user;
+    // TODO authenticate
+    console.log("Looking up user with ID " + receivedUser.userID);
+    var user = userManager.findUserByID(receivedUser.userID);
+    console.log("Found user with ID " + user.userID);
+    if(user === null) {
+        response.write("ERROR user not found");
+        response.end();
+        return;
+    }
+    var game = gameManager.findGameByID(receivedData.gameID);
+    if(game.hasUser(user)) {
+        var ourBoats = new Array();
+        for(var i = 0; i < receivedData.ourBoats.length; i++) {
+            var boat = new Boat();
+            ObjectHelper.copyDataToObject(receivedData.ourBoats[i], boat, ["index", "size", "horizontal"]);
+            ourBoats.push(boat);
+            // TODO verify boat setup
+        }
+
+        game.placeBoats(user, receivedData.ourBoats);
+    } // TODO Failure of finding user in game
+    var status = {status: "OK"};
+    response.write(JSON.stringify(status));
     response.end();
 }
 

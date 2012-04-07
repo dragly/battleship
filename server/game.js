@@ -43,6 +43,11 @@ Game.prototype.hasUser = function (user) {
     }
 }
 
+Game.prototype.placeBoats = function(user, ourBoats) {
+            var playerIndex = this.getIndexOfUserID(user.userID);
+            this.players[playerIndex].boats = ourBoats;
+        }
+
 Game.prototype.findDestroyedBoats = function(playerIndex) {
             var boats;
             var shotMask;

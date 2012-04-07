@@ -8,11 +8,13 @@
 //Show list of games
 
 //New random game via comm
-Receive game data from server and show this on screen
-Place boats
+//Receive game data from server and show this on screen
+//Place boats
+Send boats to server
+Make server verify boat data
 Wait for opponent / refreshing
-Request game data (also used for opening games which have updates)
-Back button to menu
+//Request game data (also used for opening games which have updates)
+//Back button to menu
 Switch boards
 
 Place bombs one by one and receive hit information

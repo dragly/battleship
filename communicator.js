@@ -30,6 +30,17 @@ Communicator.prototype.ajaxCall = function(url,callback, data) {
     });
 }
 
+Communicator.prototype.requestPlaceBoats = function (user, game, ourBoats, callback) {
+    var self = this;
+    var params = { user: user.authData(), ourBoats: ourBoats, gameID: game.gameID };
+    this.ajaxCall("http://" + this.serverUrl + "/placeBoats", function(response) { self.receivedNewUser(response, callback); }, params);
+}
+
+Communicator.prototype.receivedPlaceBoats = function (receivedData, callback) {
+    //TODO Error handling if boats could not be placed
+    callback();
+}
+
 Communicator.prototype.requestNewUser = function (callback) {
     var self = this;
     this.ajaxCall("http://" + this.serverUrl + "/newUser", function(response) { self.receivedNewUser(response, callback); });
