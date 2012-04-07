@@ -6,8 +6,8 @@ function User() {
 }
 
 User.prototype.authData = function() {
-            return {
-                userID: this.userID,
-                key: this.key
-            }
-        }
+    return {
+        userID: this.userID,
+        key: this.key
+    }
+}

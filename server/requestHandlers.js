@@ -32,11 +32,10 @@ function shoot(response, postData) { //var params = { user: user.userID, key: us
     console.log("Request handler 'shoot' was called.");
     response.writeHead(200, { "Content-Type": defaultHeader });
     var data = JSON.parse(post.json);
-    var boatIsHit = false;
-    var success = false;
+
     var game = gameManager.findGameByID(data.gameID);
 
-    var gameData = { success: success, index: data.index, boat: boatIsHit };
+    var gameData = { success: false, index: data.index, boat: false };
 
     //Do mandatory checks //TODO: Add auth
     if (game !== null /*&& auth */) {
@@ -47,23 +46,26 @@ function shoot(response, postData) { //var params = { user: user.userID, key: us
         if (data.user.userID === game.players[pI].user.userID /* in case it returns the p2 and it aint equal*/ 
         && (data.index < game.nRows * game.nCols) && (data.index >= 0) && !isNaN(parseInt(data.index * 1)) /*the index is valid*/
         && !MaskHelper.getValueOfIndex(game.players[oppI].shotMask, data.index)) {
-            //TODO: check if it was the users turn
-            success = true;
+            //TODO: check if it was the users turn (and alt. ammo.
+            gameData.success = true;
             
             //fire the cannons!
             MaskHelper.setIndex(game.players[oppI].shotMask, data.index);
 
-            //TODO: advance the game, and remove ammo from the user
+            //TODO: advance the game, and remove ammo from the user.
 
             if (MaskHelper.getValueOfIndex(game.player[oppI].boatMask, data.index)) {
-                boatIsHot = true;
-                //TODO: If a boat was hit, call "Boat hit logic", and end game if nececarry.
+                gameData.boat = true; //"the tile contains a boat"
 
-                //TODO: send the boat element as newBoatSunk if the boat is now completely covered in holes
+                if (MaskHelper.and(game.players[oppI].boatMask, game.players[oppI].shotMask) === game.players[oppI].boatMask) {  //check if the game is over
+                   //TODO: End the game.
+                }
 
-                //TODO: implement boatAtIndex(data.index);
-               // if //TODO: is boat convered in holes function.
-                        //gameData.newBoatSunk = boat;
+                var boat = 0; //TODO: implement = boatAtIndex(data.index);
+                var bm = boat.mask(game.nRows, game.nCols);
+                if (MaskHelper.and(bm, game.players[oppI].shotMask) === bm) {
+                    gameData.newBoatSunk = boat;
+                }
             }
         }     
     }
