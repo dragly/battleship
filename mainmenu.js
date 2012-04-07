@@ -103,7 +103,7 @@ MainMenu.prototype.showLoginScreen = function () {
     this.menuState = MenuState.Login;
 
     this.buttonHandler.hideAll();
-    this.newUserButton.show();
+//    this.newUserButton.show();
 
     this.redraw();
     $.mobile.changePage("#loginPage");
@@ -114,7 +114,7 @@ MainMenu.prototype.showGameList = function () {
     this.requestGameList();
 
     this.buttonHandler.hideAll();
-    this.newRandomGameButton.show();
+//    this.newRandomGameButton.show();
 
     this.redraw();
     $.mobile.changePage("#gameListPage");
