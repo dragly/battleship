@@ -38,8 +38,8 @@ function MainMenu() {
     var self = this;
     this.buttonHandler = new ButtonHandler();
 
-    this.newUserButton = new Button(this.buttonHandler, 100, 300, 200, 50, "Create new user", function () { self.requestNewUser() }); // <3 jallascript
-    this.newRandomGameButton = new Button(this.buttonHandler, 100, 400, 200, 50, "New Random Game", function () { self.requestRandomGame() });
+//    this.newUserButton = new Button(this.buttonHandler, 100, 300, 200, 50, "Create new user", function () { self.requestNewUser() }); // <3 jallascript
+//    this.newRandomGameButton = new Button(this.buttonHandler, 100, 400, 200, 50, "New Random Game", function () { self.requestRandomGame() });
     this.goToGameListButton = new Button(this.buttonHandler, 100, 500, 200, 50, "Exit to Game List", function () { self.showGameList() });
 
     // Set up JQuery mobile
@@ -93,6 +93,9 @@ MainMenu.prototype.initApplication = function () {
     if (this.user === null) {
         this.showLoginScreen();
     }
+    // Set canvas to fullscreen (minus some UI stuff)
+    this.ctx.canvas.width = window.innerWidth;
+    this.ctx.canvas.height = window.innerHeight - 50;
 }
 
 MainMenu.prototype.showLoginScreen = function () {
@@ -220,9 +223,6 @@ MainMenu.prototype.receivedRandomGame = function (game) {
 // *********** DRAWING STUFF *********** //
 
 MainMenu.prototype.redraw = function () {
-    // Set canvas to fullscreen (minus some UI stuff)
-    this.ctx.canvas.width = window.innerWidth;
-    this.ctx.canvas.height = window.innerHeight - 200;
 
     this.clear();
 
