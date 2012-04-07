@@ -5,7 +5,7 @@ function User() {
     this.key = "";
 }
 
-User.protoType.auth = function (userID, key) {
+User.prototype.auth = function (userID, key) {
     return (userID === this.userID && key === this.key);
 }
 User.prototype.generateRandomKey = function () {
