@@ -9,17 +9,29 @@ GameList.prototype.addGames = function(receivedGames) {
             console.log(receivedGames);
             for(var j = 0; j < receivedGames.length; j++) {
                 var hadGameAlready = false;
+                var receivedGame = receivedGames[j];
                 for(var i = 0; i < this.games.length; i++) {
-                    console.log("Comparing local game " + this.games[i].gameID + " with remote " + receivedGames[j].gameID);
-                    if(this.games[i].gameID === receivedGames[j].gameID) {
+                    // IMPORTANT The games are not equal, so we must compare game ID.
+                    // The game from the server is generated as a new local object.
+                    console.log("Comparing local game " + this.games[i].gameID + " with remote " + receivedGame.gameID);
+                    if(this.games[i].gameID === receivedGame.gameID) {
                         console.log("We had this game already, updating");
-                        this.games[i] = receivedGames[j];
+                        this.games[i] = receivedGame;
                         hadGameAlready = true;
+                        if(this.mainMenu.currentGame.gameID === receivedGame.gameID
+                                && this.mainMenu.currentGame.gameState !== GameState.PlaceBoats) { // avoid overwriting our game while we're placing boats
+                            this.mainMenu.currentGame = receivedGame;
+                            if(this.mainMenu.menuState === MenuState.Ours) {
+                                this.mainMenu.showOurBoard();
+                            } else if(this.mainMenu.menuState === MenuState.Theirs) {
+                                this.mainMenu.showTheirBoard();
+                            }
+                        }
                     }
                 }
                 if(!hadGameAlready) {
                     console.log("Appending a game");
-                    this.games.push(receivedGames[j]);
+                    this.games.push(receivedGame);
                 }
             }
 
