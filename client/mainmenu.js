@@ -30,6 +30,7 @@ function MainMenu() {
     this.lastPosX = 0;
     this.lastPosY = 0;
     this.crosshairIndex = -1;
+    this.refreshGamesTimeout = null;
 
     //Buttons
     var self = this;
@@ -49,6 +50,17 @@ function MainMenu() {
             defaultDialogTransition: 'none'
         });
     });
+}
+
+MainMenu.prototype.beginRefreshGameList = function() {
+    if(this.user !== null) {
+        console.log("Refreshing game list!");
+
+        this.requestGameList();
+
+        var self = this;
+        this.refreshGamesTimeout = setTimeout(function() {self.beginRefreshGameList();}, 2000);
+    }
 }
 
 MainMenu.prototype.switchBoards = function() {
@@ -176,7 +188,7 @@ MainMenu.prototype.showLoginScreen = function () {
 
 MainMenu.prototype.showGameList = function () {
     this.menuState = MenuState.List;
-    this.requestGameList();
+//    this.requestGameList();
 
     this.buttonHandler.hideAll();
     //    this.newRandomGameButton.show();
@@ -269,13 +281,17 @@ MainMenu.prototype.requestNewUser = function () {
 MainMenu.prototype.receivedNewUser = function (user) {
     this.hideLoadingMessage();
     console.log("A new user was returned successfully!");
+    this.setLoggedInUser(user);
+}
+
+MainMenu.prototype.setLoggedInUser = function(user) {
     this.user = user;
-    console.log(this.isDragging);
     this.showGameList();
+    this.beginRefreshGameList();
 }
 
 MainMenu.prototype.requestGameList = function () {
-    this.showLoadingMessage("Loading game list...");
+//    this.showLoadingMessage("Loading game list...");
     var self = this;
     // TODO add this to the communicator class
     if (this.user === null) {
@@ -287,7 +303,7 @@ MainMenu.prototype.requestGameList = function () {
 }
 
 MainMenu.prototype.receivedGameList = function (games) {
-    this.hideLoadingMessage();
+//    this.hideLoadingMessage();
     console.log("A game list was returned successfully!");
     this.gameList.addGames(games);
     this.redraw();
