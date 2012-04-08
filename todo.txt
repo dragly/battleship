@@ -11,7 +11,7 @@
 //Receive game data from server and show this on screen
 //Place boats
 //Send boats to server
-Rotation of boats by dragging over area
+//Rotation of boats by dragging over area
 Make server verify boat data
 //Wait for opponent / refreshing
 //Request game data (also used for opening games which have updates)
@@ -22,6 +22,9 @@ Show whose turn it is + Waiting for opponent
 //Place bombs one by one and receive hit information
 
 //Close/reopen game
+
+Designing background
+Designing boats
 
 Exponential polling time
 

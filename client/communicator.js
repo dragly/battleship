@@ -78,7 +78,7 @@ Communicator.prototype.receivedShootTile = function (gameData, callback) {
         newBoatSunk = new Boat();
         ObjectHelper.copyDataToObject(gameData.newBoatSunk, newBoatSunk, ["index", "size", "horizontal"]);
         // TODO This is really bad. Find nCols from somehwere or do this update position while drawing instead!
-        newBoatSunk.updatePosition(8);
+        newBoatSunk.refreshPosition(8);
     }
     //handle gamestate
     if (gameData.success)
