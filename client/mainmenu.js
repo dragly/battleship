@@ -350,12 +350,12 @@ MainMenu.prototype.redraw = function () {
                 var hasBoat = MaskHelper.getValueOfIndex(this.currentGame.ourBoatMask, index);
                 if (hasHit) {
                     if (hasBoat) {
-                        this.ctx.fillStyle = "rgb(255,255,0)";
-                    } else {
                         this.ctx.fillStyle = "rgb(255,0,0)";
+                    } else {
+                        this.ctx.fillStyle = "rgb(150,150,255)";
                     }
                 } else {
-                    this.ctx.fillStyle = "rgb(0,255,0)";
+                    this.ctx.fillStyle = "rgb(0,0,255)";
                 }
                 this.ctx.fillRect(j * tileSize, i * tileSize, tileSize, tileSize);
             }
@@ -376,10 +376,10 @@ MainMenu.prototype.redraw = function () {
                     if (hasBoat) {
                         this.ctx.fillStyle = "rgb(255,0,0)";
                     } else {
-                        this.ctx.fillStyle = "rgb(0,0,255)";
+                        this.ctx.fillStyle = "rgb(150,150,255)";
                     }
                 } else {
-                    this.ctx.fillStyle = "rgb(0,255,0)";
+                    this.ctx.fillStyle = "rgb(0,0,255)";
                 }
                 this.ctx.fillRect(j * tileSize, i * tileSize, tileSize, tileSize);
                 if (index === this.crosshairIndex) {

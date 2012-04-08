@@ -41,12 +41,12 @@ Communicator.prototype.requestPlaceBoats = function (user, game, ourBoats, callb
 
 Communicator.prototype.receivedPlaceBoats = function (receivedData, callback) {
     //TODO Error handling if boats could not be placed
-    if(receivedData.error === undefined) {
+    if (receivedData.error === undefined) {
         console.log("No error");
     }
 
     console.log("Received data from game after placing boats");
-    var game = Game.createGameFromData(receivedData)
+    var game = Game.createGameFromData(receivedData);
     callback(game);
 }
 
@@ -97,8 +97,8 @@ Communicator.prototype.requestRandomGame = function (user, callback) {
 
 Communicator.prototype.receivedRandomGame = function (gameData, callback) {
     console.log("Received random game!");
-    var game = Game.createGameFromData(gameData)
-    callback( game);
+    var game = Game.createGameFromData(gameData);
+    callback(game);
 }
 
 Communicator.prototype.requestGameList = function (user, games, callback) {

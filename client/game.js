@@ -47,7 +47,7 @@ Game.createGameFromData = function(gameData) {
     }
     for(var i = 0; i < gameData.theirBoats.length; i++) {
         var boat = new Boat();
-        ObjectHelper.copyDataToObject(gameData.ourBoats[i], boat, ["index", "horizontal", "size"]);
+        ObjectHelper.copyDataToObject(gameData.theirBoats[i], boat, ["index", "horizontal", "size"]);
         boat.updatePosition(gameData.nCols);
         game.theirBoats.push(boat);
     }
