@@ -36,10 +36,13 @@ MaskHelper.compare = function (mask1, mask2) {
     return isEqual;
 }
 
-MaskHelper.setIndex = function (mask, tileIndex) {
+MaskHelper.setIndex = function (mask, tileIndex, value) {
+    if(value === undefined) {
+        value = 0x1;
+    }
     var memberIndex = Math.floor(tileIndex / 32);
     var nBit = tileIndex % 32;
-    mask[memberIndex] = (mask[memberIndex] | (0x1 << nBit));
+    mask[memberIndex] = (mask[memberIndex] | (value << nBit));
 }
 
 MaskHelper.getValueOfIndex = function (mask, tileIndex) {
