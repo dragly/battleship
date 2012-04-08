@@ -1,0 +1,2 @@
+require('./testserver');
+require('./testclient');
