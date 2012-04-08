@@ -59,7 +59,7 @@ MainMenu.prototype.beginRefreshGameList = function() {
         this.requestGameList();
 
         var self = this;
-        this.refreshGamesTimeout = setTimeout(function() {self.beginRefreshGameList();}, 2000);
+        this.refreshGamesTimeout = setTimeout(function() {self.beginRefreshGameList();}, 10000);
     }
 }
 
@@ -178,7 +178,8 @@ MainMenu.prototype.initApplication = function () {
 MainMenu.prototype.showLoginScreen = function () {
     this.hideLoadingMessage();
     this.menuState = MenuState.Login;
-
+    this.user = null;
+    clearTimeout(this.refreshGamesTimeout);
     this.buttonHandler.hideAll();
     //    this.newUserButton.show();
 

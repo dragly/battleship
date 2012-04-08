@@ -1,5 +1,5 @@
 OTHER_FILES += \
-    todo.txt \
+    ../todo.txt \
     index.html \
     ../server/*.js \
     *.js \
