@@ -39,6 +39,18 @@
   <a data-role="button" data-transition="fade" onclick="mainMenu.requestNewUser()">
       Create new user
   </a>
+  <a data-role="button" data-transition="fade" onclick="mainMenu.setServerUrl('cartman.dragly.org:8888')">
+      Use cartman server
+  </a>
+  <a data-role="button" data-transition="fade" onclick="mainMenu.setServerUrl('localhost:8888')">
+      Use localhost server
+  </a>
+  Custom server:
+  <input type="text" id="serverurl" > </input>
+
+  <a data-role="button" data-transition="fade" onclick="mainMenu.setServerUrl($('#serverurl').val())">
+      Use custom server
+  </a>
   </div>
   <div data-role="page" id="gameListPage">
       <div data-theme="a" data-role="header">

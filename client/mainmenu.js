@@ -85,6 +85,12 @@ MainMenu.prototype.initApplication = function () {
     this.ctx.canvas.height = window.innerHeight - 5;
 }
 
+MainMenu.prototype.setServerUrl = function(serverUrl) {
+    this.communicator.serverUrl = serverUrl;
+    console.log("Server URL set to " + serverUrl);
+    this.showLoginScreen();
+}
+
 MainMenu.prototype.beginRefreshGameList = function() {
     if(this.user !== null) {
         console.log("Refreshing game list!");
