@@ -19,7 +19,7 @@ function MainMenu() {
     this.mouseHelper = new MouseHelper();
     this.communicator = new Communicator(this);
     this.gameList = new GameList(this);
-    this.communicator.serverUrl = "localhost:8888"; // "192.168.1.105:8888";
+    this.communicator.serverUrl = "cartman.dragly.org:8888"; // "192.168.1.105:8888";
     this.menuState = MenuState.Login; // 0 - game menu, 1 - our table, 2 - their table, 3 - login user
 //    this.gameState = GameState.PlaceBoats; // 0 - place boats, 1 - waiting for opponent, 2 - your turn, 3 - their turn
     this.canvas = 0;
@@ -53,6 +53,37 @@ function MainMenu() {
     });
 }
 
+// Initialize everything. Check for user id. Load settings.
+MainMenu.prototype.initApplication = function () {
+    this.canvas = document.getElementById("canvas");
+    if (!this.canvas.getContext) {
+        console.log("ERROR: Could not find canvas!");
+        return;
+    }
+    this.ctx = this.canvas.getContext("2d");
+
+    var self = this;
+
+    this.canvas.addEventListener("mousemove", function (event) { self.canvasMouseMove(event) });
+    this.canvas.addEventListener("mousedown", function (event) { self.canvasMouseDown(event) });
+    this.canvas.addEventListener("mouseup", function (event) { self.canvasMouseUp(event) });
+    this.canvas.addEventListener('touchmove', function (event) { event.preventDefault(); self.canvasMouseMove(event); });
+    this.canvas.addEventListener('touchstart', function (event) { event.preventDefault(); self.canvasMouseDown(event); });
+    this.canvas.addEventListener('touchend', function (event) { event.preventDefault(); self.canvasMouseUp(event); });
+
+    // TODO setting up tilesize should be done elsewhere and not in a global var
+    // set up UI stuff
+    //    tileSize = this.canvas.width / (nCols + 2);
+
+    // TODO add check if user exists already. We presume now that no user is created.
+    if (this.user === null) {
+        this.showLoginScreen();
+    }
+    // Set canvas to fullscreen (minus some UI stuff)
+    this.ctx.canvas.width = window.innerWidth;
+    this.ctx.canvas.height = window.innerHeight - 5;
+}
+
 MainMenu.prototype.beginRefreshGameList = function() {
     if(this.user !== null) {
         console.log("Refreshing game list!");
@@ -64,43 +95,6 @@ MainMenu.prototype.beginRefreshGameList = function() {
     }
 }
 
-MainMenu.prototype.switchBoards = function() {
-    if(this.menuState === MenuState.Theirs) {
-        this.showOurBoard();
-    } else if(this.menuState === MenuState.Ours) {
-        this.showTheirBoard();
-    }
-}
-
-MainMenu.prototype.showOurBoard = function() {
-    this.menuState = MenuState.Ours;
-    // Decide what buttons to show
-    this.buttonHandler.hideAll();
-    this.goToGameListButton.show();
-    if(this.currentGame.gameState === GameState.PlaceBoats) {
-        this.placeBoatsButton.show();
-    } else {
-        this.switchBoardsButton.show();
-    }
-
-    this.redraw();
-    $.mobile.changePage("#gamePage");
-}
-
-MainMenu.prototype.showTheirBoard = function () {
-    this.crosshairIndex = -1;
-    this.menuState = MenuState.Theirs;
-    // Decide what buttons to show
-    this.buttonHandler.hideAll();
-    this.goToGameListButton.show();
-    this.switchBoardsButton.show();
-
-    if (this.currentGame.gameState === GameState.OurTurn)
-        this.shootButton.show();
-
-    this.redraw();
-    $.mobile.changePage("#gamePage");
-}
 
 // TODO figure out how errors should be handled from communicator to the main menu
 MainMenu.prototype.httpError = function () {
@@ -144,38 +138,43 @@ MainMenu.prototype.setCrosshairIndex = function () {
         this.crosshairIndex = bestFitIndex;
 }
 
-
-// Initialize everything. Check for user id. Load settings.
-MainMenu.prototype.initApplication = function () {
-    this.canvas = document.getElementById("canvas");
-    if (!this.canvas.getContext) {
-        console.log("ERROR: Could not find canvas!");
-        return;
+MainMenu.prototype.switchBoards = function() {
+    if(this.menuState === MenuState.Theirs) {
+        this.showOurBoard();
+    } else if(this.menuState === MenuState.Ours) {
+        this.showTheirBoard();
     }
-    this.ctx = this.canvas.getContext("2d");
-
-    var self = this;
-
-    this.canvas.addEventListener("mousemove", function (event) { self.canvasMouseMove(event) });
-    this.canvas.addEventListener("mousedown", function (event) { self.canvasMouseDown(event) });
-    this.canvas.addEventListener("mouseup", function (event) { self.canvasMouseUp(event) });
-    this.canvas.addEventListener('touchmove', function (event) { event.preventDefault(); self.canvasMouseMove(event); });
-    this.canvas.addEventListener('touchstart', function (event) { event.preventDefault(); self.canvasMouseDown(event); });
-    this.canvas.addEventListener('touchend', function (event) { event.preventDefault(); self.canvasMouseUp(event); });
-
-    // TODO setting up tilesize should be done elsewhere and not in a global var
-    // set up UI stuff
-    //    tileSize = this.canvas.width / (nCols + 2);
-
-    // TODO add check if user exists already. We presume now that no user is created.
-    if (this.user === null) {
-        this.showLoginScreen();
-    }
-    // Set canvas to fullscreen (minus some UI stuff)
-    this.ctx.canvas.width = window.innerWidth;
-    this.ctx.canvas.height = window.innerHeight - 5;
 }
 
+MainMenu.prototype.showOurBoard = function() {
+    this.menuState = MenuState.Ours;
+    // Decide what buttons to show
+    this.buttonHandler.hideAll();
+    this.goToGameListButton.show();
+    if(this.currentGame.gameState === GameState.PlaceBoats) {
+        this.placeBoatsButton.show();
+    } else {
+        this.switchBoardsButton.show();
+    }
+
+    this.redraw();
+    $.mobile.changePage("#gamePage");
+}
+
+MainMenu.prototype.showTheirBoard = function () {
+    this.crosshairIndex = -1;
+    this.menuState = MenuState.Theirs;
+    // Decide what buttons to show
+    this.buttonHandler.hideAll();
+    this.goToGameListButton.show();
+    this.switchBoardsButton.show();
+
+    if (this.currentGame.gameState === GameState.OurTurn)
+        this.shootButton.show();
+
+    this.redraw();
+    $.mobile.changePage("#gamePage");
+}
 MainMenu.prototype.showLoginScreen = function () {
     this.hideLoadingMessage();
     this.menuState = MenuState.Login;
@@ -199,7 +198,18 @@ MainMenu.prototype.showGameList = function () {
     $.mobile.changePage("#gameListPage");
 }
 
+// TODO Impletement showWeWon
 MainMenu.prototype.showWeWon = function () {
+    this.buttonHandler.hideAll();
+    this.goToGameListButton.show();
+    this.switchBoardsButton.show();
+}
+
+// TODO Impletement showTheyWon
+MainMenu.prototype.showTheyWon = function () {
+    this.buttonHandler.hideAll();
+    this.goToGameListButton.show();
+    this.switchBoardsButton.show();
 }
 
 MainMenu.prototype.showGameByID = function (gameID) {
@@ -226,17 +236,20 @@ MainMenu.prototype.requestShootAtTile = function () {
     var self = this;
     //check selected tile, check ammo
     //Check if we're allowed to shoot at the tile? //show an error dialog
-    this.communicator.requestShootTile(this.user, this.currentGame, this.crosshairIndex, function (index, boat, remainingAmmo, newBoatSunk) { self.recievedShootAtTile(index, boat, remainingAmmo, newBoatSunk); });
+    this.communicator.requestShootTile(this.user, this.currentGame, this.crosshairIndex, function (index, boat, remainingAmmo, newBoatSunk, gameState) { self.recievedShootAtTile(index, boat, remainingAmmo, newBoatSunk, gameState); });
 }
 
-MainMenu.prototype.recievedShootAtTile = function (index, boat, remainingAmmo, newBoatSunk) {
+MainMenu.prototype.recievedShootAtTile = function (index, boat, remainingAmmo, newBoatSunk, gameState) {
 
     MaskHelper.setIndex(this.currentGame.theirShotMask, index);
 
     this.currentGame.currentAmmo = remainingAmmo;
     console.log("remaining Ammo: " + remainingAmmo);
+    this.currentGame.gameState = gameState;
+    console.log("GameState set to " + gameState);
 
     //check if turn is over
+            // TODO Consider replacing with gameState === GameState.TheirTurn
     if (remainingAmmo === 0) {
         this.currentGame.gameState = GameState.TheirTurn;
         this.showTheirBoard();
@@ -245,16 +258,16 @@ MainMenu.prototype.recievedShootAtTile = function (index, boat, remainingAmmo, n
     if (boat) { //if we hit a boat
         MaskHelper.setIndex(this.currentGame.theirBoatMask, index);
 
-        if (newBoatSunk != undefined) { //append a boat object
+        if (newBoatSunk !== undefined) { //append a boat object
             this.currentGame.theirBoats.push(newBoatSunk);
-
-            //check if the game is over
-            if (MaskHelper.compare(MaskHelper.and(this.currentGame.theirBoatMask, this.currentGame.theirShotMask), this.currentGame.theirBoatMask)) {
-                this.currentGame.gameState === GameState.WeWon;
-                this.showWeWon();
-            }
         }
     }
+    if(gameState === GameState.WeWon) {
+        this.showWeWon();
+    } else if(gameState === GameState.TheyWon) {
+        this.showTheyWon();
+    }
+
     this.redraw();
     //TODO: remove one ammo or complete turn if we're out of ammo
 }
@@ -364,6 +377,7 @@ MainMenu.prototype.redraw = function () {
             this.currentGame.ourBoats[i].draw(this.ctx);
         }
         this.ctx.fillStyle = "rgb(255,0,0)";
+        this.ctx.font = "12pt Arial";
         this.ctx.fillText("Mine", 10, 20);
     } else if (this.menuState === MenuState.Theirs) {
         // TODO Draw the board
@@ -395,13 +409,25 @@ MainMenu.prototype.redraw = function () {
             this.currentGame.theirBoats[i].draw(this.ctx);
         }
         this.ctx.fillStyle = "rgb(255,0,0)";
+        this.ctx.font = "12pt Arial";
         this.ctx.fillText("Theirs", 10, 20);
-    } else {
-        console.log("WARNING: Unknown menu state: " + this.menuState);
+    }
+
+    if(this.menuState === MenuState.Ours || this.menuState === MenuState.Theirs) {
+        if(this.currentGame.gameState === GameState.WeWon) {
+            this.ctx.fillStyle = "rgb(0,255,0)";
+            this.ctx.font = "30pt Arial";
+            this.ctx.fillText("We won! :D", 100, 200);
+        } else if(this.currentGame.gameState === GameState.TheyWon) {
+            this.ctx.fillStyle = "rgb(255,0,0)";
+            this.ctx.font = "30pt Arial";
+            this.ctx.fillText("They won... :(", 100, 200);
+        }
     }
 
     this.buttonHandler.draw(this.ctx);
 
+    this.ctx.font = "12pt Arial";
     this.ctx.fillText("GameState: " + this.currentGame.gameState, this.canvas.width - 100, 10);
 
     //this.ctx.fillStyle = "rgb(200,50,0)";

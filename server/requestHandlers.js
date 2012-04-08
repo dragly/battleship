@@ -37,63 +37,69 @@ function shoot(response, postData) { //var params = { user: user.userID, key: us
 
     var game = gameManager.findGameByID(data.gameID);
 
-    var gameData = { success: false, index: data.index, boat: false };
+    var gameData = { success: false, index: data.index, boat: false, gameState: null };
 
     //Do mandatory checks
 
     var user = userManager.findUserByID(data.user.userID);
-    if (game !== null /*&& auth */) {
-     
-        var pI = game.getIndexOfUser(user);
-        var oppI = (pI === 1) ? 0 : 1;
-        gameData.success = false;
-        if (user === game.players[pI].user) { /* in case it returns the p2 and it aint equal*/
-            if ((data.index < game.nRows * game.nCols) && (data.index >= 0) && !isNaN(parseInt(data.index * 1)))  {/*the index is valid*/
-                if( !MaskHelper.getValueOfIndex(game.players[oppI].shotMask, data.index)) {
-                    if (game.currentPlayer === user) { /*users turn*/
-                        if( !MaskHelper.getValueOfIndex(game.players[oppI].shotMask, data.index)) { /*the tile hasn't already been shot at*/
-                            //TODO: check if it was the users turn (and alt. ammo.
-                            gameData.success = true;
-                        } else console.log("Tile already shot!");
-                    } else console.log("Not users turn!");
-                } else console.log("Value of index found!");
-            } else console.log("Index invalid!");
-        } else console.log("Returned but it aint equal!");
-        if(gameData.success) {
-            //fire the cannons!
-            MaskHelper.setIndex(game.players[oppI].shotMask, data.index);
-
-            //Remove ammo from the user.
-            game.remainingShots--;
-            gameData.remainingShots = game.remainingShots;
-
-            if (game.remainingShots === 0) {
-                game.currentPlayer = game.players[oppI].user;
-                game.turn++;
-                game.remainingShots = 5;
-            }
-
-            if (MaskHelper.getValueOfIndex(game.players[oppI].boatMask, data.index)) { // check if anything is hit
-                gameData.boat = true; //"the tile contains a boat"
-
-                if (MaskHelper.compare(MaskHelper.and(game.players[oppI].boatMask, game.players[oppI].shotMask),game.players[oppI].boatMask)) { //check if the game is over
-                    game.winner = user;
-                }
-
-                var boat = {};
-                for (var i = 0; i < game.players[oppI].boats.length; i++) {
-                    if (MaskHelper.getValueOfIndex(game.players[oppI].boats[i].mask(), data.index)) { // check what boat is hit
-                        boat = game.players[oppI].boats[i];
-                        break;
-                    }
-                }
-                var bm = boat.mask();
-                if (MaskHelper.compare(MaskHelper.and(bm, game.players[oppI].shotMask),bm)) { // check if boat is sunk
-                    gameData.newBoatSunk = boat.toBoatData();
-                }
-            }
-        }     
+    if (game === null /*|| !auth */) {
+        console.log("Error. Game does not exist or user not authed!");
+        response.write("Error. Game does not exist or user not authed!");
+        response.end();
+        return;
     }
+
+    var pI = game.getIndexOfUser(user);
+    var oppI = (pI === 1) ? 0 : 1;
+    gameData.success = false;
+    if (user === game.players[pI].user) { /* in case it returns the p2 and it aint equal*/
+        if ((data.index < game.nRows * game.nCols) && (data.index >= 0) && !isNaN(parseInt(data.index * 1)))  {/*the index is valid*/
+            if( !MaskHelper.getValueOfIndex(game.players[oppI].shotMask, data.index)) {
+                if (game.currentPlayer === user) { /*users turn*/
+                    if( !MaskHelper.getValueOfIndex(game.players[oppI].shotMask, data.index)) { /*the tile hasn't already been shot at*/
+                        //TODO: check if it was the users turn (and alt. ammo.
+                        gameData.success = true;
+                    } else console.log("Tile already shot!");
+                } else console.log("Not users turn!");
+            } else console.log("Value of index found!");
+        } else console.log("Index invalid!");
+    } else console.log("Returned but it aint equal!");
+    if(gameData.success) {
+        //fire the cannons!
+        MaskHelper.setIndex(game.players[oppI].shotMask, data.index);
+
+        //Remove ammo from the user.
+        game.remainingShots--;
+        gameData.remainingShots = game.remainingShots;
+
+        if (game.remainingShots === 0) {
+            game.currentPlayer = game.players[oppI].user;
+            game.turn++;
+            game.remainingShots = 5;
+        }
+
+        if (MaskHelper.getValueOfIndex(game.players[oppI].boatMask, data.index)) { // check if anything is hit
+            gameData.boat = true; //"the tile contains a boat"
+
+            if (MaskHelper.compare(MaskHelper.and(game.players[oppI].boatMask, game.players[oppI].shotMask),game.players[oppI].boatMask)) { //check if the game is over
+                game.winner = user;
+            }
+
+            var boat = {};
+            for (var i = 0; i < game.players[oppI].boats.length; i++) {
+                if (MaskHelper.getValueOfIndex(game.players[oppI].boats[i].mask(), data.index)) { // check what boat is hit
+                    boat = game.players[oppI].boats[i];
+                    break;
+                }
+            }
+            var bm = boat.mask();
+            if (MaskHelper.compare(MaskHelper.and(bm, game.players[oppI].shotMask),bm)) { // check if boat is sunk
+                gameData.newBoatSunk = boat.toBoatData();
+            }
+        }
+    }
+    gameData.gameState = game.gameState(user);
+
     response.write(JSON.stringify(gameData));
     response.end();    
 }
@@ -147,8 +153,8 @@ function placeBoats(response, postData) {
         for(var i = 0; i < receivedData.ourBoats.length; i++) {
             var boat = player.boats[i];
             ObjectHelper.copyDataToObject(receivedData.ourBoats[i], boat, ["index", "size", "horizontal"]);
-            player.boatMask = MaskHelper.or(player.boatMask, boat.mask());
         }
+        game.updateBoatMask(playerIndex);
         console.log("Boat mask is now " + player.boatMask);
         // TODO validate new boat positions
         var validSetup = true;

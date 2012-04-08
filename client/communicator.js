@@ -65,6 +65,12 @@ Communicator.prototype.receivedNewUser = function (receivedUserData, callback) {
     callback(myUser);
 }
 
+Communicator.prototype.requestShootTile = function (user, game, index, callback) {
+    var self = this;
+    var params = { user: user.authData(), gameID: game.gameID, index: index };
+    this.ajaxCall("http://" + this.serverUrl + "/shoot", function (response) { self.receivedShootTile(response, callback); }, params);
+}
+
 Communicator.prototype.receivedShootTile = function (gameData, callback) {
     mainMenu.hideLoadingMessage();
     var newBoatSunk = undefined;
@@ -76,18 +82,10 @@ Communicator.prototype.receivedShootTile = function (gameData, callback) {
     }
     //handle gamestate
     if (gameData.success)
-        callback(gameData.index, gameData.boat, gameData.remainingShots, newBoatSunk);
+        callback(gameData.index, gameData.boat, gameData.remainingShots, newBoatSunk, gameData.gameState);
     else
         console.log("Error: Illegal shoot action!");
 }
-
-
-Communicator.prototype.requestShootTile = function (user, game, index, callback) {
-    var self = this;
-    var params = { user: user.authData(), gameID: game.gameID, index: index };
-    this.ajaxCall("http://" + this.serverUrl + "/shoot", function (response) { self.receivedShootTile(response, callback); }, params);
-}
-
 Communicator.prototype.requestRandomGame = function (user, callback) {
     var self = this;
     console.log("Requesting random game");

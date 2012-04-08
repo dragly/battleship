@@ -16,31 +16,6 @@ GameManager.prototype.addGame = function (user) {
     game.gameID = this.currentGameID;
     game.currentPlayer = user;
 
-    for (var i = 0; i < 2; i++) {
-        for (var j = 0; j < 5; j++) {
-            var size = 0;
-            var boat;
-            switch (j) {
-                case 0:
-                case 1:
-                    size = 2;
-                    break;
-                case 2:
-                case 3:
-                    size = 3;
-                    break;
-                case 4:
-                    size = 4;
-                    break;
-            }
-
-            boat = new Boat(game);
-            boat.index = j;
-            boat.size = size;
-            game.players[i].boats.push(boat)
-        }
-    }
-
     console.log("Made game with user " + game.players[0].user.userID);
 
     this.games.push(game);

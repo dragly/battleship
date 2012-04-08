@@ -81,6 +81,7 @@ Button.prototype.draw = function (ctx) {
     ctx.fillStyle = "rgb(200,50,0)";
     ctx.fillRect(this.x, this.y, this.width, this.height);
     ctx.fillStyle = "rgb(255,255,255)";
+    ctx.font = "12pt Arial";
     ctx.fillText(this.text, this.x + 10, this.y + 30);
 }
     
