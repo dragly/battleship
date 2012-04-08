@@ -83,6 +83,7 @@ function shoot(response, postData) { //var params = { user: user.userID, key: us
 
             if (MaskHelper.compare(MaskHelper.and(game.players[oppI].boatMask, game.players[oppI].shotMask),game.players[oppI].boatMask)) { //check if the game is over
                 game.winner = user;
+                game.turn += 1;
             }
 
             var boat = {};
