@@ -26,6 +26,7 @@ function MainMenu() {
     this.ctx = 0;
     this.user = null;
     this.isDragging = null;
+    this.mouseDown = false;
     this.currentGame = 0;
     this.lastPosX = 0;
     this.lastPosY = 0;
@@ -40,7 +41,7 @@ function MainMenu() {
     this.placeBoatsButton = new Button(this.buttonHandler, 100, 400, 200, 50, "Place boats", function () { self.requestPlaceBoats() });
     this.goToGameListButton = new Button(this.buttonHandler, 100, 500, 200, 50, "Exit to Game List", function () { self.showGameList() });
     this.switchBoardsButton = new Button(this.buttonHandler, 100, 400, 200, 50, "Switch board", function () { self.switchBoards() });
-    this.shootButton = new Button(this.buttonHandler, 100, 450, 200, 50, "Switch board", function () { self.requestShootAtTile() });
+    this.shootButton = new Button(this.buttonHandler, 100, 450, 200, 50, "Fire!", function () { self.requestShootAtTile() });
 
     // Set up JQuery mobile
     $(document).bind("mobileinit", function () {
@@ -220,10 +221,13 @@ MainMenu.prototype.recievedShootAtTile = function (index, boat, remainingAmmo, n
     MaskHelper.setIndex(this.currentGame.theirShotMask, index);
 
     this.currentGame.currentAmmo = remainingAmmo;
+    console.log("remaining Ammo: " + remainingAmmo);
 
     //check if turn is over
-    if (remainingAmmo === 0)
+    if (remainingAmmo === 0) {
+        this.currentGame.gameState = GameState.TheirTurn;
         this.showTheirBoard();
+    }
 
     if (boat) { //if we hit a boat
         MaskHelper.setIndex(this.currentGame.theirBoatMask, index);
@@ -232,10 +236,13 @@ MainMenu.prototype.recievedShootAtTile = function (index, boat, remainingAmmo, n
             this.currentGame.theirBoats.push(newBoatSunk);
 
             //check if the game is over
-            if (MaskHelper.compare(MaskHelper.and(this.currentGame.theirBoatMask, this.currentGame.theirShotMask), this.currentGame.theirBoatMask))
+            if (MaskHelper.compare(MaskHelper.and(this.currentGame.theirBoatMask, this.currentGame.theirShotMask), this.currentGame.theirBoatMask)) {
+                this.currentGame.gameState === GameState.WeWon;
                 this.showWeWon();
+            }
         }
     }
+    this.redraw();
     //TODO: remove one ammo or complete turn if we're out of ammo
 }
 
@@ -350,9 +357,9 @@ MainMenu.prototype.redraw = function () {
                 var hasBoat = MaskHelper.getValueOfIndex(this.currentGame.theirBoatMask, index);
                 if (hasHit) {
                     if (hasBoat) {
-                        this.ctx.fillStyle = "rgb(255,255,0)";
-                    } else {
                         this.ctx.fillStyle = "rgb(255,0,0)";
+                    } else {
+                        this.ctx.fillStyle = "rgb(0,0,255)";
                     }
                 } else {
                     this.ctx.fillStyle = "rgb(0,255,0)";
@@ -361,7 +368,7 @@ MainMenu.prototype.redraw = function () {
                 if (index === this.crosshairIndex) {
                     this.ctx.fillStyle = "#FFFF00";
                     this.ctx.beginPath();
-                    this.ctx.arc(j * tileSize, i * tileSize, 50, 0, Math.PI * 2, true);
+                    this.ctx.arc(j * tileSize +tileSize/2, i * tileSize+tileSize/2, 25, 0, Math.PI * 2, true);
                     this.ctx.closePath();
                     this.ctx.fill();
                 }
@@ -373,7 +380,7 @@ MainMenu.prototype.redraw = function () {
         this.ctx.fillStyle = "rgb(255,0,0)";
         this.ctx.fillText("Theirs", 10, 20);
     } else {
-        console.log("WARNING: Unknown menu state!");
+        console.log("WARNING: Unknown menu state: " + this.menuState);
     }
 
     this.buttonHandler.draw(this.ctx);
@@ -394,7 +401,7 @@ MainMenu.prototype.canvasMouseMove = function (e) {
     this.lastPosX = mousePos.x;
     this.lastPosY = mousePos.y;
 
-    if (this.menuState === MenuState.Theirs && this.currentGame.gameState === GameState.OurTurn) {
+    if (this.menuState === MenuState.Theirs && this.currentGame.gameState === GameState.OurTurn && this.mouseDown) {
         this.setCrosshairIndex();
         this.redraw();
     }
@@ -409,6 +416,7 @@ MainMenu.prototype.canvasMouseMove = function (e) {
 }
 
 MainMenu.prototype.canvasMouseUp = function (e) {
+    this.mouseDown = false;
 
     //var mousePos = this.mouseHelper.getCursorPosition(e, this.canvas); //This aint passed on touch phones
     var x = this.lastPosX;
@@ -442,6 +450,7 @@ MainMenu.prototype.canvasMouseUp = function (e) {
 }
 
 MainMenu.prototype.canvasMouseDown = function (e) {
+    this.mouseDown = true;
     var mousePos = this.mouseHelper.getCursorPosition(e, this.canvas);
     this.lastPosX = mousePos.x;
     this.lastPosY = mousePos.y;
