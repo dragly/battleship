@@ -51,7 +51,7 @@ Game.prototype.updateBoatMask = function(playerIndex) {
 
 Game.prototype.initBoats = function() {
     for (var i = 0; i < 2; i++) {
-        for (var j = 0; j < 5; j++) {
+        for (var j = 0; j < 1; j++) {
             var size = 0;
             var boat;
             switch (j) {

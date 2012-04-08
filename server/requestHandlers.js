@@ -81,7 +81,7 @@ function shoot(response, postData) { //var params = { user: user.userID, key: us
         if (MaskHelper.getValueOfIndex(game.players[oppI].boatMask, data.index)) { // check if anything is hit
             gameData.boat = true; //"the tile contains a boat"
 
-            if (MaskHelper.compare(MaskHelper.and(game.players[oppI].boatMask, game.players[oppI].shotMask),game.players[oppI].boatMask)) { //check if the game is over
+            if (game.findWinner() === user) { //check if the game is over
                 game.winner = user;
                 game.turn += 1;
             }

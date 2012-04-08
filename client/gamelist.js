@@ -38,7 +38,7 @@ GameList.prototype.addGames = function(receivedGames) {
             $("#gameList").empty();
             for(var i = 0; i < this.games.length; i++) {
                 var game = this.games[i];
-                $("<li><a onclick='mainMenu.showGameByID(" + game.gameID + ")' >Game " + game.gameID + "</a></li>").appendTo($("#gameList"));
+                $("<li><a onclick='mainMenu.showGameByID(" + game.gameID + ")' >Game " + game.gameID + " state: " + game.gameState + "</a></li>").appendTo($("#gameList"));
             }
             this.refresh();
             console.log("We now have " + this.games.length + " games available to play.")
