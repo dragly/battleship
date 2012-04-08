@@ -80,16 +80,16 @@ function shoot(response, postData) { //var params = { user: user.userID, key: us
                     game.winner = user;
                 }
 
-                var boat = null;
+                var boat = {};
                 for (var i = 0; i < game.players[oppI].boats.length; i++) {
-                    if (MaskHelper.getValueOfIndex(game.players[oppI].boats[i].mask(game.nRows, game.nCols), data.index)) { // check what boat is hit
+                    if (MaskHelper.getValueOfIndex(game.players[oppI].boats[i].mask(), data.index)) { // check what boat is hit
                         boat = game.players[oppI].boats[i];
                         break;
                     }
                 }
-                var bm = boat.mask(game.nRows, game.nCols);
+                var bm = boat.mask();
                 if (MaskHelper.compare(MaskHelper.and(bm, game.players[oppI].shotMask),bm)) { // check if boat is sunk
-                    gameData.newBoatSunk = boat;
+                    gameData.newBoatSunk = boat.toBoatData();
                 }
             }
         }     
@@ -147,7 +147,7 @@ function placeBoats(response, postData) {
         for(var i = 0; i < receivedData.ourBoats.length; i++) {
             var boat = player.boats[i];
             ObjectHelper.copyDataToObject(receivedData.ourBoats[i], boat, ["index", "size", "horizontal"]);
-            player.boatMask = MaskHelper.or(player.boatMask, boat.mask(game.nRows, game.nCols));
+            player.boatMask = MaskHelper.or(player.boatMask, boat.mask());
         }
         console.log("Boat mask is now " + player.boatMask);
         // TODO validate new boat positions

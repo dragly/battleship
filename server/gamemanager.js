@@ -34,7 +34,7 @@ GameManager.prototype.addGame = function (user) {
                     break;
             }
 
-            boat = new Boat();
+            boat = new Boat(game);
             boat.index = j;
             boat.size = size;
             game.players[i].boats.push(boat)

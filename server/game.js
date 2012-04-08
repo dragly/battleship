@@ -68,8 +68,8 @@ Game.prototype.findDestroyedBoats = function(playerIndex) {
             var hitBoats = new Array();
             for(var i = 0; i < boats.length; i++) {
                 var boat = boats[i];
-                var boatHitMask = MaskHelper.and(boat.mask(this.nRows,this.nCols), shotMask);
-                if (MaskHelper.compare(boatHitMask, boat.mask(this.nRows, this.nCols))) {
+                var boatHitMask = MaskHelper.and(boat.mask(), shotMask);
+                if (MaskHelper.compare(boatHitMask, boat.mask())) {
                     hitBoats.push(boat);
                 }
             }
@@ -115,15 +115,28 @@ Game.convertGameToGameData = function(user, game) {
         gameState = GameState.TheirTurn;
     }
 
+    var ourBoats = new Array();
+    var theirDestroyedBoats = game.findDestroyedBoats(theirIndex);
+    var theirBoats = new Array();
+
+    for(var i = 0; i < ourPlayer.boats.length; i++) {
+        var boat = ourPlayer.boats[i];
+        ourBoats.push(boat.toBoatData());
+    }
+    for(var i = 0; i < theirDestroyedBoats.length; i++) {
+        var boat = theirDestroyedBoats[i];
+        theirBoats.push(boat.toBoatData());
+    }
+
     // TODO Send our boats, our shot mask, our boat mask, their shot mask, our hit mask
     return {
         opponent: opponent,
         gameID: game.gameID,
-        ourBoats: ourPlayer.boats,
+        ourBoats: ourBoats,
         ourBoatMask: ourPlayer.boatMask,
         ourShotMask: ourPlayer.shotMask,
 //        ourBoatsPlaced: ourPlayer.boatsPlaced,
-        theirBoats: game.findDestroyedBoats(theirIndex),
+        theirBoats: theirBoats,
         // set their boatMask to only those that we have shot
         theirBoatMask: MaskHelper.and(theirPlayer.boatMask, theirPlayer.shotMask),
         theirShotMask: theirPlayer.shotMask,

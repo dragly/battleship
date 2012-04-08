@@ -1,12 +1,15 @@
 var MaskHelper = require("../shared/maskhelper.js").MaskHelper;
-
-function Boat() {
+var ObjectHelper = require("../shared/objecthelper.js").ObjectHelper;
+function Boat(game) {
     this.index = -1;
     this.horizontal = false;
     this.size = 0;
+    this.game = game;
 }
 
-Boat.prototype.mask = function(nRows, nCols) {
+Boat.prototype.mask = function() {
+    var nRows = this.game.nRows;
+    var nCols = this.game.nCols;
     var myMask = new Array();
     for(var i = 0; i < (nRows * nCols) / 32; i++) {
         myMask.push(0);
@@ -21,6 +24,13 @@ Boat.prototype.mask = function(nRows, nCols) {
         }
     }
     return myMask;
+}
+
+Boat.prototype.toBoatData = function() {
+    var boatData = {};
+    var boatDataToCopy = ["index", "size", "horizontal"];
+    ObjectHelper.copyDataToObject(this, boatData, boatDataToCopy);
+    return boatData;
 }
 
 exports.Boat = Boat;
