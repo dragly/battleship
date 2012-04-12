@@ -148,6 +148,14 @@ function placeBoats(response, postData) {
     if(game.hasUser(user)) {
         var playerIndex = game.getIndexOfUser(user);
         var player = game.players[playerIndex];
+
+
+        var numBoatTiles = 0;
+        for (var i = 0; i < game.nRows * game.nCols; i++) {
+            if (MaskHelper.getValueOfIndex(player.boatMask, i))
+                numBoatTiles++;
+        }
+
         player.boatMask = game.emptyMask();
         // TODO validate that the length of the boat array is the same
         for(var i = 0; i < receivedData.ourBoats.length; i++) {
@@ -156,9 +164,12 @@ function placeBoats(response, postData) {
         }
         game.updateBoatMask(playerIndex);
         console.log("Boat mask is now " + player.boatMask);
-        // TODO validate new boat positions
-        var validSetup = true;
-        if(validSetup) {
+        
+        for (var i = 0; i < game.nRows * game.nCols;i++ ) { //dirty fix to check that boats don't overlap or are outside the board
+            if (MaskHelper.getValueOfIndex(player.boatMask, i))
+                numBoatTiles--;
+        }
+        if(numBoatTiles == 0) {
             game.turn += 1;
             player.boatsPlaced = true;
         }
