@@ -81,8 +81,9 @@ function shoot(response, postData) { //var params = { user: user.userID, key: us
         if (MaskHelper.getValueOfIndex(game.players[oppI].boatMask, data.index)) { // check if anything is hit
             gameData.boat = true; //"the tile contains a boat"
 
-            if (MaskHelper.compare(MaskHelper.and(game.players[oppI].boatMask, game.players[oppI].shotMask),game.players[oppI].boatMask)) { //check if the game is over
+            if (game.findWinner() === user) { //check if the game is over
                 game.winner = user;
+                game.turn += 1;
             }
 
             var boat = {};
@@ -192,9 +193,22 @@ function status(response, postData) {
     console.log("Request handler 'start' was called.");
     response.writeHead(200, {"Content-Type": defaultHeader});
     response.write("Users (test)\n\n");
-    response.write(JSON.stringify(userManager.users) + "\n");
+    response.write(userManager.users.length + "\n");
+    for(var i = 0; i < userManager.users.length; i++) {
+        var user = userManager.users[i];
+        var userData = {};
+        ObjectHelper.copyDataToObject(user, userData, ["userID", "username", "password"]);
+        response.write(JSON.stringify(userData) + "\n");
+    }
+
     response.write("Games\n\n");
-    response.write(JSON.stringify(gameManager.games) + "\n");
+    response.write(gameManager.games.length + "\n");
+    for(var i = 0; i < gameManager.users.length; i++) {
+        var game = userManager.users[i];
+        var gameData = {};
+        ObjectHelper.copyDataToObject(game, gameData, ["gameID", "turn"]);
+        response.write(JSON.stringify(gameData) + "\n");
+    }
     response.end();
 }
 
