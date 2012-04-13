@@ -30,6 +30,11 @@ function newUser(response, postData) {
     response.end();
 }
 
+//function userLogin(response, postData) { //Just for the user to make sure he aint connecting with a unknow
+//    console.log("User sign in");
+
+//}
+
 function shoot(response, postData) { //var params = { user: user.userID, key: user.key, gameID: game.gameID, tile: index };
     console.log("Request handler 'shoot' was called.");
     response.writeHead(200, { "Content-Type": defaultHeader });
@@ -42,7 +47,7 @@ function shoot(response, postData) { //var params = { user: user.userID, key: us
     //Do mandatory checks
 
     var user = userManager.findUserByID(data.user.userID);
-    if (game === null /*|| !auth */) {
+    if (game === null/* || !userManager.auth(data.user.userID,data.user.key)*/) {
         console.log("Error. Game does not exist or user not authed!");
         response.write("Error. Game does not exist or user not authed!");
         response.end();

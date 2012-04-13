@@ -26,6 +26,8 @@ function MainMenu() {
     this.ctx = 0;
     this.user = null;
     this.draggedBoat = null;
+    this.draggedBoatIndex = 0;
+    this.draggedBoatHorizontal = false;
     this.mouseDown = false;
     this.currentGame = 0;
     this.lastPosX = 0;
@@ -309,6 +311,7 @@ MainMenu.prototype.requestNewUser = function () {
 MainMenu.prototype.receivedNewUser = function (user) {
     this.hideLoadingMessage();
     console.log("A new user was returned successfully!");
+    localStorage.setItem('user', user);
     this.setLoggedInUser(user);
 }
 
@@ -505,19 +508,59 @@ MainMenu.prototype.canvasMouseUp = function (e) {
                     var diffX = j * tileSize - x + boat.width / 2;
                     var diffY = i * tileSize - y + boat.height / 2;
                     var ourFit = diffX * diffX + diffY * diffY;
-                    if (ourFit < bestFit) {
+
+                    if (ourFit < bestFit
+                    && ((boat.horizontal && (index % this.currentGame.nCols + boat.size <= this.currentGame.nCols)) 
+                    || (!boat.horizontal && (Math.floor(index / this.currentGame.nCols) + boat.size <= this.currentGame.nRows)))) {
                         bestFit = ourFit;
                         bestFitIndex = index;
                     }
                 }
             }
+            //check if legal position
+            var numBoats = MaskHelper.getNumSetFlags(this.currentGame.ourBoatMask);
             boat.setIndex(bestFitIndex);
+            var newBoatMask = this.generateBoatMask();
+            if (numBoats === MaskHelper.getNumSetFlags(newBoatMask)) {
+                this.currentGame.ourBoatMask = newBoatMask;
+            } else {
+                console.log("Num boats: " + numBoats + " numnewBoats: " + MaskHelper.getNumSetFlags(newBoatMask));
+                boat.horizontal = this.draggedBoatHorizontal;
+                boat.setIndex(this.draggedBoatIndex);
+            }
         }
     }
     this.buttonHandler.mouseReleased(x, y);
     this.draggedBoat = null;
     this.redraw();
     return false;
+}
+
+// May be moved, but i needed this func somewhere clientside.
+MainMenu.prototype.generateBoatMask = function () {
+    var nRows = this.currentGame.nRows;
+    var nCols = this.currentGame.nCols;
+    var mask = new Array();
+    for (var i = 0; i < (nRows * nCols) / 32; i++) {
+        mask.push(0);
+    }
+    for (var i = 0; i < this.currentGame.ourBoats.length; i++) {
+        var boat = this.currentGame.ourBoats[i];
+        if (boat.horizontal) {
+            if (boat.index % nCols + boat.size <= nCols) {
+                for (var j = 0; j < boat.size; j++) {
+                    MaskHelper.setIndex(mask, boat.index + j);
+                }
+            }
+        } else {
+            if (Math.floor(boat.index / nCols) + boat.size <= nRows) {
+                for (var j = 0; j < boat.size; j++) {
+                    MaskHelper.setIndex(mask, boat.index + (nCols * j));
+                }
+            }
+        }
+    }
+    return mask;
 }
 
 MainMenu.prototype.canvasMouseDown = function (e) {
@@ -535,6 +578,8 @@ MainMenu.prototype.canvasMouseDown = function (e) {
             if (boat.isClicked(mousePos.x, mousePos.y)) {
                 console.log("boat clicked!!");
                 this.draggedBoat = boat;
+                this.draggedBoatIndex = boat.index;
+                this.draggedBoatHorizontal = boat.horizontal;
             }
         }
     } else if (this.menuState === MenuState.Theirs && this.currentGame.gameState === GameState.OurTurn) {

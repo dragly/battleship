@@ -46,5 +46,5 @@ Boat.prototype.refreshPosition = function(nCols) {
 }
 
 Boat.prototype.isClicked = function(x,y) {
-            return (x > this.x && y > this.y && x < this.x + this.width && y < this.y + this.height);
+    return (x > this.x && y > this.y && x < this.x + this.width && y < this.y + this.height);
 }
