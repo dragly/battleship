@@ -54,3 +54,15 @@ MaskHelper.getValueOfIndex = function (mask, tileIndex) {
 if(typeof exports != 'undefined') {
     exports.MaskHelper = MaskHelper;
 }
+
+MaskHelper.getNumSetFlags = function (mask) {
+    var numFlags=0;       
+    for (var i = 0; i < mask.length;i++ ) {
+        for (var j = 0; j < 32;j++ ) {  //TODO if resoruces need to be saved: tempstore and shift one bit at a time
+            if (((mask[i] >> j) & 0x1) == 0x1) {
+                numFlags++;
+            }
+        }
+    }
+    return numFlags;
+}
