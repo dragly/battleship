@@ -1,4 +1,4 @@
-var tileSize = 50;
+var tileSize = 60;
 var tileMargin = 0;
 
 //var servOurTiles = new Array();
@@ -42,10 +42,30 @@ function MainMenu() {
 
     //    this.newUserButton = new Button(this.buttonHandler, 100, 300, 200, 50, "Create new user", function () { self.requestNewUser() }); // <3 jallascript
     //    this.newRandomGameButton = new Button(this.buttonHandler, 100, 400, 200, 50, "New Random Game", function () { self.requestRandomGame() });
-    this.placeBoatsButton = new Button(this.buttonHandler, 100, 400, 200, 50, "Place boats", function () { self.requestPlaceBoats() });
-    this.goToGameListButton = new Button(this.buttonHandler, 100, 500, 200, 50, "Exit to Game List", function () { self.showGameList() });
-    this.switchBoardsButton = new Button(this.buttonHandler, 100, 400, 200, 50, "Switch board", function () { self.switchBoards() });
-    this.shootButton = new Button(this.buttonHandler, 100, 450, 200, 50, "Fire!", function () { self.requestShootAtTile() });
+    this.placeBoatsButton = new Button(this.buttonHandler, 100, 500, 200, 50, "Place boats", function () { self.requestPlaceBoats() });
+    this.goToGameListButton = new Button(this.buttonHandler, 100, 600, 200, 50, "Exit to Game List", function () { self.showGameList() });
+    this.switchBoardsButton = new Button(this.buttonHandler, 100, 500, 200, 50, "Switch board", function () { self.switchBoards() });
+    this.shootButton = new Button(this.buttonHandler, 100, 550, 200, 50, "Fire!", function () { self.requestShootAtTile() });
+
+    // Load images and store them by size in the array
+    this.boatImagesV = new Array();
+    this.boatImagesV[2] = new Image();
+    this.boatImagesV[2].src = "images/boats/smallboat-up.png"
+    this.boatImagesV[3] = new Image();
+    this.boatImagesV[3].src = "images/boats/cruiser-up.png"
+    this.boatImagesV[4] = new Image();
+    this.boatImagesV[4].src = "images/boats/carrier-up.png"
+    this.boatImagesH = new Array();
+    this.boatImagesH[2] = new Image();
+    this.boatImagesH[2].src = "images/boats/smallboat.png"
+    this.boatImagesH[3] = new Image();
+    this.boatImagesH[3].src = "images/boats/cruiser.png"
+    this.boatImagesH[4] = new Image();
+    this.boatImagesH[4].src = "images/boats/carrier.png"
+
+    // load background image
+    this.backgroundImage = new Image();
+    this.backgroundImage.src = "images/background.png";
 
     // Set up JQuery mobile
     $(document).bind("mobileinit", function () {
@@ -364,15 +384,17 @@ MainMenu.prototype.redraw = function () {
 
     this.clear();
 
+    this.ctx.drawImage(this.backgroundImage, 0,0);
+
 
     if(!this.draggedBoat) {
         this.buttonHandler.draw(this.ctx);
     } else {
         this.ctx.fillStyle = "rgb(50,100,200)";
-        this.ctx.fillRect(100, 400, 200, 200);
+        this.ctx.fillRect(100, 500, 200, 200);
         this.ctx.fillStyle = "rgb(255,255,255)";
         this.ctx.font = "12pt Arial";
-        this.ctx.fillText("Drag here to rotate", 120, 500);
+        this.ctx.fillText("Drag here to rotate", 120, 600);
     }
 
     if (this.menuState === MenuState.Ours) {
@@ -384,18 +406,16 @@ MainMenu.prototype.redraw = function () {
                 var hasBoat = MaskHelper.getValueOfIndex(this.currentGame.ourBoatMask, index);
                 if (hasHit) {
                     if (hasBoat) {
-                        this.ctx.fillStyle = "rgb(255,0,0)";
+                        this.ctx.fillStyle = "rgba(255,0,0,0.5)";
                     } else {
-                        this.ctx.fillStyle = "rgb(150,150,255)";
+                        this.ctx.fillStyle = "rgba(150,150,255,0.5)";
                     }
-                } else {
-                    this.ctx.fillStyle = "rgb(0,0,255)";
+                    this.ctx.fillRect(j * tileSize, i * tileSize, tileSize, tileSize);
                 }
-                this.ctx.fillRect(j * tileSize, i * tileSize, tileSize, tileSize);
             }
         }
         for (var i = 0; i < this.currentGame.ourBoats.length; i++) {
-            this.currentGame.ourBoats[i].draw(this.ctx);
+            this.currentGame.ourBoats[i].draw(this.ctx, this.boatImagesH, this.boatImagesV);
         }
         this.ctx.fillStyle = "rgb(255,0,0)";
         this.ctx.font = "12pt Arial";
@@ -409,14 +429,12 @@ MainMenu.prototype.redraw = function () {
                 var hasBoat = MaskHelper.getValueOfIndex(this.currentGame.theirBoatMask, index);
                 if (hasHit) {
                     if (hasBoat) {
-                        this.ctx.fillStyle = "rgb(255,0,0)";
+                        this.ctx.fillStyle = "rgba(255,0,0,0.5)";
                     } else {
-                        this.ctx.fillStyle = "rgb(150,150,255)";
+                        this.ctx.fillStyle = "rgba(150,150,255,0.5)";
                     }
-                } else {
-                    this.ctx.fillStyle = "rgb(0,0,255)";
+                    this.ctx.fillRect(j * tileSize, i * tileSize, tileSize, tileSize);
                 }
-                this.ctx.fillRect(j * tileSize, i * tileSize, tileSize, tileSize);
                 if (index === this.crosshairIndex) {
                     this.ctx.fillStyle = "#FFFF00";
                     this.ctx.beginPath();
@@ -427,7 +445,7 @@ MainMenu.prototype.redraw = function () {
             }
         }
         for (var i = 0; i < this.currentGame.theirBoats.length; i++) {
-            this.currentGame.theirBoats[i].draw(this.ctx);
+            this.currentGame.theirBoats[i].draw(this.ctx, this.boatImagesH, this.boatImagesV);
         }
         this.ctx.fillStyle = "rgb(255,0,0)";
         this.ctx.font = "12pt Arial";
@@ -470,10 +488,8 @@ MainMenu.prototype.canvasMouseMove = function (e) {
 
     if (this.draggedBoat !== null) {
         var boat = this.draggedBoat;
-        boat.x = mousePos.x - boat.width / 2;
-        boat.y = mousePos.y - boat.height / 2;
 
-        if(mousePos.x > 100 && mousePos.x < 300 && mousePos.y > 400 && mousePos.y < 600) {
+        if(mousePos.x > 100 && mousePos.x < 300 && mousePos.y > 500 && mousePos.y < 700) {
             // boat has been dragged to rotation field
             if(!this.draggedBoatHasRotated) { // for the first time
                 this.draggedBoatHasRotated = true;
@@ -483,6 +499,8 @@ MainMenu.prototype.canvasMouseMove = function (e) {
         } else { // outside means it could be rotated again on drag back in
             this.draggedBoatHasRotated = false;
         }
+        boat.x = mousePos.x - boat.width / 2;
+        boat.y = mousePos.y - boat.height / 2;
 
         this.redraw();
     }
