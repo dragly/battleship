@@ -28,6 +28,8 @@ function MainMenu() {
     this.draggedBoat = null;
     this.draggedBoatIndex = 0;
     this.draggedBoatHorizontal = false;
+    this.dragOffsetX = 0;
+    this.dragOffsetY = 0;
     this.mouseDown = false;
     this.currentGame = 0;
     this.lastPosX = 0;
@@ -509,8 +511,8 @@ MainMenu.prototype.canvasMouseMove = function (e) {
         } else { // outside means it could be rotated again on drag back in
             this.draggedBoatHasRotated = false;
         }
-        boat.x = mousePos.x - boat.width / 2;
-        boat.y = mousePos.y - boat.height / 2;
+        boat.x = mousePos.x - this.dragOffsetX; // - boat.width / 2
+        boat.y = mousePos.y - this.dragOffsetY; // - boat.height / 2;
 
         this.redraw();
     }
@@ -534,8 +536,8 @@ MainMenu.prototype.canvasMouseUp = function (e) {
             for (var i = 0; i < this.currentGame.nRows; i++) {
                 for (var j = 0; j < this.currentGame.nCols; j++) {
                     var index = i * this.currentGame.nCols + j;
-                    var diffX = j * tileSize - x + boat.width / 2;
-                    var diffY = i * tileSize - y + boat.height / 2;
+                    var diffX = j * tileSize - x + this.dragOffsetX;
+                    var diffY = i * tileSize - y + this.dragOffsetY;
                     var ourFit = diffX * diffX + diffY * diffY;
 
                     if (ourFit < bestFit
@@ -609,6 +611,8 @@ MainMenu.prototype.canvasMouseDown = function (e) {
                 this.draggedBoat = boat;
                 this.draggedBoatIndex = boat.index;
                 this.draggedBoatHorizontal = boat.horizontal;
+                this.dragOffsetX = mousePos.x - boat.x;
+                this.dragOffsetY = mousePos.y - boat.y;
             }
         }
     } else if (this.menuState === MenuState.Theirs && this.currentGame.gameState === GameState.OurTurn) {
