@@ -1,4 +1,4 @@
-var tileSize = 50;
+//var tileSize = 50;
 var tileMargin = 0;
 
 function Boat(image) {
@@ -55,7 +55,8 @@ Boat.prototype.draw = function(ctx, boatImagesH, boatImagesV) {
     ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
 }
 
-Boat.prototype.refreshRotation = function() {
+Boat.prototype.refreshRotation = function () {
+    var tileSize = Math.round(document.getElementById("canvas").width / this.nCols);
     this.length = tileSize * this.size;
     if(this.horizontal) {
         this.width = this.length;
@@ -66,7 +67,8 @@ Boat.prototype.refreshRotation = function() {
     }
 }
 
-Boat.prototype.refreshPosition = function(nCols) {
+Boat.prototype.refreshPosition = function (nCols) {
+    var tileSize = Math.round(document.getElementById("canvas").width / nCols); //TODO: Store it instead of getting it each call
     this.nCols = nCols;
     this.column = this.index % nCols;
     this.row = Math.floor(this.index / nCols);

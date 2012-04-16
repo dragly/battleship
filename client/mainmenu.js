@@ -1,4 +1,4 @@
-var tileSize = 60;
+//var tileSize = 60;
 var tileMargin = 0;
 
 //var servOurTiles = new Array();
@@ -124,6 +124,14 @@ MainMenu.prototype.beginRefreshGameList = function() {
     }
 }
 
+MainMenu.prototype.relToReal = function (pos) {
+    return Math.round(pos * this.canvas.width);
+}
+
+MainMenu.prototype.relBottomToReal = function (pos) { //returns pos relative to the lower edge
+    return Math.round(this.canvas.height - pos * this.canvas.width);
+}
+
 
 // TODO figure out how errors should be handled from communicator to the main menu
 MainMenu.prototype.httpError = function () {
@@ -148,7 +156,7 @@ MainMenu.prototype.clear = function () {
 
 //set crosshair index
 MainMenu.prototype.setCrosshairIndex = function () {
-
+    var tileSize = Math.round(this.canvas.width/this.currentGame.nCols);
     var bestFit = 99999999;
     var bestFitIndex = 0;
     for (var i = 0; i < this.currentGame.nRows; i++) {
@@ -383,18 +391,20 @@ MainMenu.prototype.receivedRandomGame = function (game) {
 MainMenu.prototype.redraw = function () {
 
     this.clear();
+    var scale = this.canvas.width/this.backgroundImage.width;
+    this.ctx.drawImage(this.backgroundImage, 0, 0, Math.round(this.backgroundImage.width * scale), Math.round(this.backgroundImage.height * scale));
+    var tileSize = Math.round(this.canvas.width / this.currentGame.nCols);
 
-    this.ctx.drawImage(this.backgroundImage, 0,0);
 
-
-    if(!this.draggedBoat) {
+    if (!this.draggedBoat) {
         this.buttonHandler.draw(this.ctx);
     } else {
         this.ctx.fillStyle = "rgb(50,100,200)";
-        this.ctx.fillRect(100, 500, 200, 200);
+        this.ctx.fillRect(this.relToReal(0.25), this.relToReal(1.1), this.relToReal(0.5), this.relBottomToReal(0.1) - this.relToReal(1.1));
+        //console.log("hmm: " + this.relToReal(1));
         this.ctx.fillStyle = "rgb(255,255,255)";
         this.ctx.font = "12pt Arial";
-        this.ctx.fillText("Drag here to rotate", 120, 600);
+        this.ctx.fillText("Drag here to rotate", this.relToReal(0.30), this.relToReal(1) + Math.round((this.relBottomToReal(0) - this.relToReal(1)) / 2));
     }
 
     if (this.menuState === MenuState.Ours) {
@@ -438,7 +448,7 @@ MainMenu.prototype.redraw = function () {
                 if (index === this.crosshairIndex) {
                     this.ctx.fillStyle = "#FFFF00";
                     this.ctx.beginPath();
-                    this.ctx.arc(j * tileSize +tileSize/2, i * tileSize+tileSize/2, 25, 0, Math.PI * 2, true);
+                    this.ctx.arc(j * tileSize + tileSize / 2, i * tileSize + tileSize / 2, 25, 0, Math.PI * 2, true);
                     this.ctx.closePath();
                     this.ctx.fill();
                 }
@@ -452,12 +462,12 @@ MainMenu.prototype.redraw = function () {
         this.ctx.fillText("Theirs", 10, 20);
     }
 
-    if(this.menuState === MenuState.Ours || this.menuState === MenuState.Theirs) {
-        if(this.currentGame.gameState === GameState.WeWon) {
+    if (this.menuState === MenuState.Ours || this.menuState === MenuState.Theirs) {
+        if (this.currentGame.gameState === GameState.WeWon) {
             this.ctx.fillStyle = "rgb(0,255,0)";
             this.ctx.font = "30pt Arial";
             this.ctx.fillText("We won! :D", 100, 200);
-        } else if(this.currentGame.gameState === GameState.TheyWon) {
+        } else if (this.currentGame.gameState === GameState.TheyWon) {
             this.ctx.fillStyle = "rgb(255,0,0)";
             this.ctx.font = "30pt Arial";
             this.ctx.fillText("They won... :(", 100, 200);
@@ -489,7 +499,7 @@ MainMenu.prototype.canvasMouseMove = function (e) {
     if (this.draggedBoat !== null) {
         var boat = this.draggedBoat;
 
-        if(mousePos.x > 100 && mousePos.x < 300 && mousePos.y > 500 && mousePos.y < 700) {
+        if (mousePos.x > this.relToReal(0.25) && mousePos.x < this.relToReal(0.75) && mousePos.y > this.relToReal(1.1) && mousePos.y < this.relBottomToReal(0.1)) {
             // boat has been dragged to rotation field
             if(!this.draggedBoatHasRotated) { // for the first time
                 this.draggedBoatHasRotated = true;
@@ -509,6 +519,7 @@ MainMenu.prototype.canvasMouseMove = function (e) {
 
 MainMenu.prototype.canvasMouseUp = function (e) {
     this.mouseDown = false;
+    var tileSize = Math.round(this.canvas.width / this.currentGame.nCols);
 
     //var mousePos = this.mouseHelper.getCursorPosition(e, this.canvas); //This aint passed on touch phones
     var x = this.lastPosX;
