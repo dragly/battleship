@@ -507,6 +507,8 @@ MainMenu.prototype.canvasMouseMove = function (e) {
                 this.draggedBoatHasRotated = true;
                 boat.horizontal = !boat.horizontal;
                 boat.refreshRotation();
+                this.dragOffsetX = boat.width / 2;
+                this.dragOffsetY = boat.height / 2;
             }
         } else { // outside means it could be rotated again on drag back in
             this.draggedBoatHasRotated = false;
