@@ -31,35 +31,25 @@ Boat.prototype.draw = function(ctx, boatImagesH, boatImagesV) {
         img = boatImagesH[this.size];
         scale = this.width / img.width;
         if(this.size === 4) {
-            y -= 15; // adjust for big carrier
-        } else if(this.size === 3){
-            y -= 5;
+            y -= 10; // adjust for big carrier
         }
-        if(this.size > 2) {
-            x -= 8;
-        } else {
-            x += 8;
+        if(this.size === 2) {
+            x += 15;
+            y += 10;
         }
     } else {
         img = boatImagesV[this.size];
         scale = this.height / img.height;
         if(this.size === 4) {
-            x -= 15; // adjust for big carrier
-        } else if(this.size === 3){
-            x -= 5;
+            x -= 10; // adjust for big carrier
         }
-        if(this.size > 2) {
-            y -= 8;
-        } else {
-            y += 8;
+        if(this.size === 2) {
+            x += 10;
+            y += 15;
         }
     }
-    if(this.size === 3) {
-        scale *= 1.2;
-    } else if(this.size === 4) {
-        scale *= 1.05;
-    } else {
-        scale *= 0.8;
+    if(this.size === 2) {
+        scale *= 0.6;
     }
 
     ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
