@@ -33,6 +33,11 @@ function newUser(response, postData) {
     response.end();
 }
 
+//function userLogin(response, postData) { //Just for the user to make sure he aint connecting with a unknow
+//    console.log("User sign in");
+
+//}
+
 function shoot(response, postData) { //var params = { user: user.userID, key: user.key, gameID: game.gameID, tile: index };
     console.log("Request handler 'shoot' was called.");
     response.writeHead(200, { "Content-Type": defaultHeader });
@@ -45,7 +50,7 @@ function shoot(response, postData) { //var params = { user: user.userID, key: us
     //Do mandatory checks
 
     var user = userManager.findUserByID(data.user.userID);
-    if (game === null /*|| !auth */) {
+    if (game === null/* || !userManager.auth(data.user.userID,data.user.key)*/) {
         console.log("Error. Game does not exist or user not authed!");
         response.write("Error. Game does not exist or user not authed!");
         response.end();
@@ -84,8 +89,9 @@ function shoot(response, postData) { //var params = { user: user.userID, key: us
         if (MaskHelper.getValueOfIndex(game.players[oppI].boatMask, data.index)) { // check if anything is hit
             gameData.boat = true; //"the tile contains a boat"
 
-            if (MaskHelper.compare(MaskHelper.and(game.players[oppI].boatMask, game.players[oppI].shotMask),game.players[oppI].boatMask)) { //check if the game is over
+            if (game.findWinner() === user) { //check if the game is over
                 game.winner = user;
+                game.turn += 1;
             }
 
             var boat = {};
@@ -151,6 +157,9 @@ function placeBoats(response, postData) {
     if(game.hasUser(user)) {
         var playerIndex = game.getIndexOfUser(user);
         var player = game.players[playerIndex];
+
+        var numBoatTiles = MaskHelper.getNumSetFlags(player.boatMask); //Used for later compare
+
         player.boatMask = game.emptyMask();
         // TODO validate that the length of the boat array is the same
         for(var i = 0; i < receivedData.ourBoats.length; i++) {
@@ -159,9 +168,8 @@ function placeBoats(response, postData) {
         }
         game.updateBoatMask(playerIndex);
         console.log("Boat mask is now " + player.boatMask);
-        // TODO validate new boat positions
-        var validSetup = true;
-        if(validSetup) {
+        
+        if(numBoatTiles ==  MaskHelper.getNumSetFlags(player.boatMask)) { //still the same amount of tiles set?
             game.turn += 1;
             player.boatsPlaced = true;
         }
@@ -184,9 +192,22 @@ function status(response, postData) {
     console.log("Request handler 'start' was called.");
     response.writeHead(200, {"Content-Type": defaultHeader});
     response.write("Users (test)\n\n");
-    response.write(JSON.stringify(userManager.users) + "\n");
+    response.write(userManager.users.length + "\n");
+    for(var i = 0; i < userManager.users.length; i++) {
+        var user = userManager.users[i];
+        var userData = {};
+        ObjectHelper.copyDataToObject(user, userData, ["userID", "username", "password"]);
+        response.write(JSON.stringify(userData) + "\n");
+    }
+
     response.write("Games\n\n");
-    response.write(JSON.stringify(gameManager.games) + "\n");
+    response.write(gameManager.games.length + "\n");
+    for(var i = 0; i < gameManager.users.length; i++) {
+        var game = userManager.users[i];
+        var gameData = {};
+        ObjectHelper.copyDataToObject(game, gameData, ["gameID", "turn"]);
+        response.write(JSON.stringify(gameData) + "\n");
+    }
     response.end();
 }
 

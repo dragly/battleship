@@ -15,12 +15,14 @@ Boat.prototype.mask = function() {
         myMask.push(0);
     }
     if(this.horizontal) {
-        for(var j = 0; j < this.size; j++) {
-            MaskHelper.setIndex(myMask, this.index+j);
+        for (var j = 0; j < this.size; j++) {
+            if (this.index % nCols + this.size <= nCols)
+                MaskHelper.setIndex(myMask, this.index+j);
         }
     } else {
-        for(var j = 0; j < this.size; j++) {
-            MaskHelper.setIndex(myMask, this.index+(nCols*j));
+        for (var j = 0; j < this.size; j++) {
+            if (Math.floor(this.index / nCols) + this.size <= nRows)
+                MaskHelper.setIndex(myMask, this.index+(nCols*j));
         }
     }
     return myMask;
