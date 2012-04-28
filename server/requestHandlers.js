@@ -13,6 +13,9 @@ var defaultHeader = "text/plain\nAccess-Control-Allow-Origin: *";
 var userManager;
 var gameManager;
 
+var redis = require("redis"),
+    client = redis.createClient();
+
 // TODO Should be initialized elsewhere?
 userManager = new UserManager();
 gameManager = new GameManager(userManager);
