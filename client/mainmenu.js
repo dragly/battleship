@@ -41,13 +41,12 @@ function MainMenu() {
     //Buttons
     var self = this;
     this.buttonHandler = new ButtonHandler();
-
+    this.placeBoatsButton = null;
+    this.goToGameListButton = null;
+    this.switchBoardsButton = null;
+    this.shootButton = null;
     //    this.newUserButton = new Button(this.buttonHandler, 100, 300, 200, 50, "Create new user", function () { self.requestNewUser() }); // <3 jallascript
     //    this.newRandomGameButton = new Button(this.buttonHandler, 100, 400, 200, 50, "New Random Game", function () { self.requestRandomGame() });
-    this.placeBoatsButton = new Button(this.buttonHandler, 100, 500, 200, 50, "Place boats", function () { self.requestPlaceBoats() });
-    this.goToGameListButton = new Button(this.buttonHandler, 100, 600, 200, 50, "Exit to Game List", function () { self.showGameList() });
-    this.switchBoardsButton = new Button(this.buttonHandler, 100, 500, 200, 50, "Switch board", function () { self.switchBoards() });
-    this.shootButton = new Button(this.buttonHandler, 100, 550, 200, 50, "Fire!", function () { self.requestShootAtTile() });
 
     // Load images and store them by size in the array
     this.boatImagesV = new Array();
@@ -107,6 +106,12 @@ MainMenu.prototype.initApplication = function () {
     // Set canvas to fullscreen (minus some UI stuff)
     this.ctx.canvas.width = window.innerWidth;
     this.ctx.canvas.height = window.innerHeight - 5;
+
+    //Add buttons
+    this.placeBoatsButton = new Button(this.buttonHandler, this.relToReal(0.25), this.relToReal(1.05), this.relToReal(0.5), this.relToReal(0.12), "Place boats", function () { self.requestPlaceBoats() });
+    this.goToGameListButton = new Button(this.buttonHandler, this.relToReal(0.25), this.relToReal(1.29), this.relToReal(0.5), this.relToReal(0.12), "Exit to Game List", function () { self.showGameList() });
+    this.switchBoardsButton = new Button(this.buttonHandler, this.relToReal(0.25), this.relToReal(1.05), this.relToReal(0.5), this.relToReal(0.12), "Switch board", function () { self.switchBoards() });
+    this.shootButton = new Button(this.buttonHandler, this.relToReal(0.25), this.relToReal(1.17), this.relToReal(0.5), this.relToReal(0.12), "Fire!", function () { self.requestShootAtTile() });
 }
 
 MainMenu.prototype.setServerUrl = function(serverUrl) {
@@ -608,8 +613,13 @@ MainMenu.prototype.canvasMouseDown = function (e) {
         console.log("spotted " + this.currentGame.ourBoats.length + "boats. With mouse coord: " + mousePos.x + "," + mousePos.y);
         for (var i = 0; i < this.currentGame.ourBoats.length; i++) {
             var boat = this.currentGame.ourBoats[i];
+            
             if (boat.isClicked(mousePos.x, mousePos.y)) {
                 console.log("boat clicked!!");
+
+                this.currentGame.ourBoats.splice(i, 1);
+                this.currentGame.ourBoats.push(boat);
+
                 this.draggedBoat = boat;
                 this.draggedBoatIndex = boat.index;
                 this.draggedBoatHorizontal = boat.horizontal;
