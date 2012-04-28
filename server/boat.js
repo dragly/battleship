@@ -4,12 +4,13 @@ function Boat(game) {
     this.index = -1;
     this.horizontal = false;
     this.size = 0;
-    this.game = game;
+    this.nRows = game.nRows;
+    this.nCols = game.nCols;
 }
 
 Boat.prototype.mask = function() {
-    var nRows = this.game.nRows;
-    var nCols = this.game.nCols;
+    var nRows = this.nRows;
+    var nCols = this.nCols;
     var myMask = new Array();
     for(var i = 0; i < (nRows * nCols) / 32; i++) {
         myMask.push(0);

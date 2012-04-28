@@ -2,6 +2,9 @@ var MaskHelper = require("../shared/maskhelper").MaskHelper;
 var ObjectHelper = require("../shared/objecthelper").ObjectHelper;
 var Boat = require("./boat").Boat;
 
+var redis = require("redis"),
+    client = redis.createClient();
+
 var GameState = {
     PlaceBoats: 0,
     Waiting: 1,
@@ -12,7 +15,7 @@ var GameState = {
 }
 
 function GameUserData() {
-    this.user = null;
+    this.userID = -1;
     this.boats = new Array();
     this.boatMask = null;
     this.shotMask = null;
@@ -26,11 +29,10 @@ function Game(nRows, nCols) {
     this.currentPlayer = null;
     this.nRows = nRows;
     this.nCols = nCols;
-    this.user = new Array();
     this.winner = null;
     
     this.players = new Array();
-    this.players[0] = new GameUserData();    
+    this.players[0] = new GameUserData();
     this.players[1] = new GameUserData();
 
     this.initBoats();
@@ -164,7 +166,7 @@ Game.prototype.gameState = function(user) {
     return gameState;
 }
 
-Game.convertGameToGameData = function (user, game) {
+Game.convertGameToGameData = function (user, game, callback) {
     var opponent = {};
 
     var ourIndex = game.getIndexOfUser(user);
@@ -173,10 +175,16 @@ Game.convertGameToGameData = function (user, game) {
     var ourPlayer = game.players[ourIndex];
     var theirPlayer = game.players[theirIndex];
 
-    if (theirPlayer.user !== null) {
-        ObjectHelper.copyDataToObject(theirPlayer.user, opponent, ["userID", "username"]);
+    if(theirPlayer.userID !== null) {
+        client.get("user:" + theirPlayer.userID, function(err, userData) {
+            ObjectHelper.copyDataToObject(userData, opponent, ["userID", "username"]);
+            Game.convertGameToGameDataPart2(user, game, opponent, ourIndex, theirIndex, ourPlayer, theirPlayer, callback);
+        });
+    } else {
+        Game.convertGameToGameDataPart2(user, game, opponent, ourIndex, theirIndex, ourPlayer, theirPlayer, callback);
     }
-
+}
+Game.convertGameToGameDataPart2 = function(user, game, opponent, ourIndex, theirIndex, ourPlayer, theirPlayer, callback) {
     var ourBoats = new Array();
     var theirDestroyedBoats = game.findDestroyedBoats(theirIndex);
     var theirBoats = new Array();
@@ -192,7 +200,10 @@ Game.convertGameToGameData = function (user, game) {
     var gameState = game.gameState(user);
 
     // TODO Send our boats, our shot mask, our boat mask, their shot mask, our hit mask
-    return {
+    console.log("Boat mask: " + theirPlayer);
+    console.log("Boat mask: " + ourPlayer);
+    console.log("Boat mask: " + theirPlayer.boatMask);
+    callback(null, {
         opponent: opponent,
         gameID: game.gameID,
         ourBoats: ourBoats,
@@ -208,7 +219,7 @@ Game.convertGameToGameData = function (user, game) {
         nRows: game.nRows,
         gameState: gameState,
         turn: game.turn
-    };
+    });
 }
 
 exports.Game = Game;

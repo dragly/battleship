@@ -8,6 +8,7 @@ var User = require("./user").User;
 var ObjectHelper = require("../shared/objecthelper").ObjectHelper;
 var MaskHelper= require("../shared/maskhelper").MaskHelper;
 
+// Makes sure Chrome and such don't complain about cross-site requests.
 var defaultHeader = "text/plain\nAccess-Control-Allow-Origin: *";
 
 var userManager;
@@ -27,7 +28,7 @@ function newUser(response, postData) {
     console.log(querystring.parse(postData));
     console.log("Request handler 'newUser' was called.");
     response.writeHead(200, {"Content-Type": defaultHeader});
-    var user = userManager.addUser(function(user) {
+    userManager.addUser(function(user) {
         console.log(JSON.stringify(user));
         response.write(JSON.stringify(user));
         response.end();
@@ -133,11 +134,13 @@ function randomGame(response, postData) {
             response.end();
             return;
         }
-        var game = gameManager.randomGame(user);
-        var gameData = Game.convertGameToGameData(user, game);
-        console.log("Writing random game: " + JSON.stringify(gameData));
-        response.write(JSON.stringify(gameData));
-        response.end();
+        gameManager.randomGame(user, function(err, game) {
+            Game.convertGameToGameData(user, game, function(err, gameData) {
+                console.log("Writing random game: " + JSON.stringify(gameData));
+                response.write(JSON.stringify(gameData));
+                response.end();
+            });
+        });
     });
 }
 
