@@ -2,6 +2,11 @@ var Game = require("./game").Game;
 var Boat = require("./boat").Boat;
 var MaskHelper = require("../shared/maskhelper.js").MaskHelper;
 var ObjectHelper = require("../shared/objecthelper.js").ObjectHelper;
+var redis = require("redis"),
+client = redis.createClient();
+client.on("error", function (err) {
+    console.log("Error " + err);
+});
 
 function GameManager(userManager) {
     this.games = new Array();
@@ -11,6 +16,68 @@ function GameManager(userManager) {
 }
 
 GameManager.prototype.addGame = function (user) {
+    
+//     // Begin work in progress
+//     client.incr("gameid");
+//     client.get("gameid", function(err, gameid) {
+//         var nBoats = 5;
+//         client.hmset("game:" + gameid, 
+//                      "gameID", gameid,
+//                      "player1", user.userid, 
+//                      "player2", null,
+//                      "currentPlayer", user.userid,
+//                      "winner", null,
+//                      "remainingShots", 5,
+//                      "nRows", 8,
+//                      "nCols", 8,
+//                      "nBoats", nBoats
+//                     );
+//         // Set up user data
+//         for(var player = 0; player < 2; player++) {
+//             client.hmset("gameplayerdata:" + gameid + ":" + player,
+//                          "userid", userid,
+//                          "boatMask", null,
+//                          "shotMask", null,
+//                          "boatsPlaced", false
+//                    );
+//         }
+//         // Set up boats
+//         for (var i = 0; i < 2; i++) {
+//             for (var j = 0; j < nBoats; j++) {
+//                 var size = 0;
+//                 var boat;
+//                 switch (j) {
+//                     case 0:
+//                     case 1:
+//                         size = 2;
+//                         break;
+//                     case 2:
+//                     case 3:
+//                         size = 3;
+//                         break;
+//                     case 4:
+//                         size = 4;
+//                         break;
+//                 }
+//                 client.hmset("boatdata:" + gameid + ":" + i + ":" + j,
+//                              "index", j,
+//                              "size", size,
+//                              "horizontal", false);
+//             }
+//             this.updateBoatMask(game, i);
+//         }
+//         
+//         // Add the game to player 1's list
+//         client.rpush("usergame:" + user.userid, gameid);
+//         
+//         // TODO initialize boats
+//         
+//         client.hgetall("game:" + gameid, function(err, game) {
+// //            callback(game); // use when the rest of the code is ready for it 
+//         });
+//     });
+//     
+    // Begin old code
     var game = new Game(8, 8);
     game.players[0].user = user;
     game.gameID = this.currentGameID;
