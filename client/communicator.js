@@ -58,6 +58,7 @@ Communicator.prototype.requestNewUser = function (callback) {
 Communicator.prototype.receivedNewUser = function (receivedUserData, callback) {
 
     //TODO Error handling if user could not be created
+  console.log("receivedUserData: " + receivedUserData);
     var myUser = new User();
     myUser.userID = receivedUserData.userID;
     myUser.username = receivedUserData.userID;

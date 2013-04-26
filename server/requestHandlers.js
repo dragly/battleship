@@ -225,10 +225,12 @@ function gameList(response, postData) {
     var receivedJson = JSON.parse(postData);
     userManager.findUserByID(receivedJson.user.userID, function(user) {
 	if(user === null) {
+	    console.log("User not found!");
 	    response.write("ERROR user not found");
 	    response.end();
 	    return;
 	}
+	console.log("User found. Getting games.");
 	var gamesToReturn = gameManager.findUpdatedGames(user, receivedJson.games);
 	var gamesToReturnLite = new Array();
 	for(var i = 0; i < gamesToReturn.length; i++) {

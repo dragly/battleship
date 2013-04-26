@@ -15,9 +15,9 @@ UserManager.prototype.addUser = function(callback) {
     client.get("userid", function(err, userid) {
 	console.log("Created user " + userid);
 	client.hmset("user:" + userid, "password", "12345", "username", "todo", "userID", userid);
-// 	this.users[this.currentUserID] = user;
-// 	this.currentUserID++;
-	callback(userid);
+	client.hgetall("user:" + userid, function(err, user) {
+	    callback(user);
+	});
     });
 }
 
