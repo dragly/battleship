@@ -1,43 +1,47 @@
 var User = require("./user").User;
+var redis = require("redis"),
+client = redis.createClient();
+client.on("error", function (err) {
+    console.log("Error " + err);
+});
 
 function UserManager() {
     this.users = new Array();
     this.currentUserID = 0;
 }
 
-UserManager.prototype.addUser = function() {
-    var user = new User();
-    user.userID = this.currentUserID;
-    user.password = "12345";
-    this.users[this.currentUserID] = user;
-    this.currentUserID++;
-    return user;
+UserManager.prototype.addUser = function(callback) {
+    client.incr("userid");
+    client.get("userid", function(err, userid) {
+	console.log(userid);
+	client.hmset("user:" + userid, "password", "12345");
+// 	this.users[this.currentUserID] = user;
+// 	this.currentUserID++;
+	callback(userid);
+    });
 }
 
-UserManager.prototype.auth = function (userID, key) {
-    if (userID === undefined || userID < 0 || userID >= this.users.size)
-        return false;
+UserManager.prototype.auth = function (userID, key, callback) {
+    if (userID === undefined || userID < 0) {
+        callback(false);
+    }
 
-    if (this.findUserByID().key === key)
-        return true;
-    else 
-        return false;
+    this.findUserByID(userid, function(user) {
+	if(user === null) {
+	    callback(false);
+	} else {
+	    callback(true);
+	}
+    });
 }
 
-UserManager.prototype.findUserByID = function (userID) {
-    if (userID === undefined || userID < 0 || userID >= this.users.size)
-        return null;
-
-            return this.users[userID];
-            // SLOW MODE:
-//            for(var i = 0; i < this.users.length; i++) {
-//                var user = users[i];
-//                if(user.userID === userID) {
-//                    return user;
-//                } else {
-//                    return null;
-//                }
-//            }
-        }
+UserManager.prototype.findUserByID = function (userID, callback) {
+    if (userID === undefined || userID < 0) {
+        callback(null);
+    }
+    client.hgetall("user:" + userID, function(err, user) {
+	callback(user);
+    });
+}
 
 exports.UserManager = UserManager;

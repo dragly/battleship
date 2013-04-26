@@ -27,10 +27,11 @@ function newUser(response, postData) {
     console.log(querystring.parse(postData));
     console.log("Request handler 'newUser' was called.");
     response.writeHead(200, {"Content-Type": defaultHeader});
-    var user = userManager.addUser();
-    console.log(JSON.stringify(user));
-    response.write(JSON.stringify(user));
-    response.end();
+    userManager.addUser(function(user) {
+	console.log(JSON.stringify(user));
+	response.write(JSON.stringify(user));
+	response.end();
+    });
 }
 
 //function userLogin(response, postData) { //Just for the user to make sure he aint connecting with a unknow
