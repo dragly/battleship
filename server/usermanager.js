@@ -13,8 +13,8 @@ function UserManager() {
 UserManager.prototype.addUser = function(callback) {
     client.incr("userid");
     client.get("userid", function(err, userid) {
-	console.log(userid);
-	client.hmset("user:" + userid, "password", "12345");
+	console.log("Created user " + userid);
+	client.hmset("user:" + userid, "password", "12345", "username", "todo", "userID", userid);
 // 	this.users[this.currentUserID] = user;
 // 	this.currentUserID++;
 	callback(userid);
