@@ -21,9 +21,9 @@ GameManager.prototype.addGame = function (user) {
 //     client.incr("gameid");
 //     client.get("gameid", function(err, gameid) {
 //         var nBoats = 5;
-//         client.hmset("game:" + gameid, 
+//         client.hmset("game:" + gameid,
 //                      "gameID", gameid,
-//                      "player1", user.userid, 
+//                      "player1", user.userid,
 //                      "player2", null,
 //                      "currentPlayer", user.userid,
 //                      "winner", null,
@@ -66,17 +66,17 @@ GameManager.prototype.addGame = function (user) {
 //             }
 //             this.updateBoatMask(game, i);
 //         }
-//         
+//
 //         // Add the game to player 1's list
 //         client.rpush("usergame:" + user.userid, gameid);
-//         
+//
 //         // TODO initialize boats
-//         
+//
 //         client.hgetall("game:" + gameid, function(err, game) {
-// //            callback(game); // use when the rest of the code is ready for it 
+// //            callback(game); // use when the rest of the code is ready for it
 //         });
 //     });
-//     
+//
     // Begin old code
     var game = new Game(8, 8);
     game.players[0].user = user;

@@ -21,15 +21,15 @@ Communicator.prototype.errorHandler = function (request, status, err) {
 
 Communicator.prototype.ajaxCall = function(url,callback, data) {
     var self = this;
-        
+
     $.ajax({
         type: "POST",
         url: url,
         data: JSON.stringify(data),
         timeout: 5000,
-        success: function(response) { callback(response); },
-        error: function (request, status, err) { self.errorHandler(request,status,err); },
-        dataType: "json"
+        success: callback,
+        error: self.errorHandler,
+        dataType: "text"
     });
 }
 
@@ -53,6 +53,13 @@ Communicator.prototype.receivedPlaceBoats = function (receivedData, callback) {
 Communicator.prototype.requestNewUser = function (callback) {
     var self = this;
     this.ajaxCall("http://" + this.serverUrl + "/newUser", function(response) { self.receivedNewUser(response, callback); });
+//    var xmlhttp = new XMLHttpRequest();
+//    xmlhttp.onreadystatechange = function() {
+//        console.log(xmlhttp.readyState);
+//        console.log(xmlhttp.responseText);
+//    }
+//    xmlhttp.open("POST", "http://" + this.serverUrl + "/newUser", true);
+//    xmlhttp.send(null);
 }
 
 Communicator.prototype.receivedNewUser = function (receivedUserData, callback) {

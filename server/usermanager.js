@@ -1,6 +1,6 @@
 var User = require("./user").User;
 var redis = require("redis"),
-client = redis.createClient();
+        client = redis.createClient();
 client.on("error", function (err) {
     console.log("Error " + err);
 });
@@ -13,11 +13,11 @@ function UserManager() {
 UserManager.prototype.addUser = function(callback) {
     client.incr("userid");
     client.get("userid", function(err, userid) {
-	console.log("Created user " + userid);
-	client.hmset("user:" + userid, "password", "12345", "username", "todo", "userID", userid);
-	client.hgetall("user:" + userid, function(err, user) {
-	    callback(user);
-	});
+        console.log("Created user " + userid);
+        client.hmset("user:" + userid, "password", "12345", "username", "todo", "userID", userid);
+        client.hgetall("user:" + userid, function(err, user) {
+            callback(user);
+        });
     });
 }
 
@@ -27,11 +27,11 @@ UserManager.prototype.auth = function (userID, key, callback) {
     }
 
     this.findUserByID(userid, function(user) {
-	if(user === null) {
-	    callback(false);
-	} else {
-	    callback(true);
-	}
+        if(user === null) {
+            callback(false);
+        } else {
+            callback(true);
+        }
     });
 }
 
@@ -40,7 +40,7 @@ UserManager.prototype.findUserByID = function (userID, callback) {
         callback(null);
     }
     client.hgetall("user:" + userID, function(err, user) {
-	callback(user);
+        callback(user);
     });
 }
 
