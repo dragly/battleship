@@ -8,8 +8,6 @@ var User = require("./user").User;
 var ObjectHelper = require("../shared/objecthelper").ObjectHelper;
 var MaskHelper= require("../shared/maskhelper").MaskHelper;
 
-var defaultHeader = "Content-type: application/json\nAccess-Control-Allow-Origin: *";
-
 var userManager;
 var gameManager;
 
@@ -20,16 +18,20 @@ var redis = require("redis"),
 userManager = new UserManager();
 gameManager = new GameManager(userManager);
 
+function writeHeaders(response) {
+    response.writeHead(200, {"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"});
+}
+
 function newUser(response, postData) {
 
     //var test = JSON.parse(postData);
     console.log("data: ");
     console.log(querystring.parse(postData));
     console.log("Request handler 'newUser' was called.");
-    response.writeHead(200, {"Content-Type": defaultHeader});
+    writeHeaders(response);
     userManager.addUser(function(user) {
-        user.key="";
         console.log("Writing back: " + JSON.stringify(user));
+        console.log("Writing back userID: " + user.userID);
         response.write(JSON.stringify(user));
         response.end();
     });
@@ -42,7 +44,7 @@ function newUser(response, postData) {
 
 function shoot(response, postData) { //var params = { user: user.userID, key: user.key, gameID: game.gameID, tile: index };
     console.log("Request handler 'shoot' was called.");
-    response.writeHead(200, { "Content-Type": defaultHeader });
+    writeHeaders(response);
     var data = JSON.parse(postData);
 
     var game = gameManager.findGameByID(data.gameID);
@@ -118,7 +120,7 @@ function shoot(response, postData) { //var params = { user: user.userID, key: us
 
 function randomGame(response, postData) {
     console.log("Request handler 'randomGame' was called.");
-    response.writeHead(200, {"Content-Type": defaultHeader});
+    writeHeaders(response);
     console.log("Received post data: " + postData);
 
     //var post = querystring.parse(postData);
@@ -143,7 +145,7 @@ function randomGame(response, postData) {
 
 function placeBoats(response, postData) {
     console.log("Request handler 'placeBoats' was called.");
-    response.writeHead(200, {"Content-Type": defaultHeader});
+    writeHeaders(response);
 
     //var post = querystring.parse(postData);
     var receivedData = JSON.parse(postData);
@@ -188,14 +190,14 @@ function placeBoats(response, postData) {
 
 function placeBomb(response, postData) {
     console.log("Request handler 'placeBomb' was called.");
-    response.writeHead(200, {"Content-Type": defaultHeader});
+    writeHeaders(response);
     response.write("Return GameState!");
     response.end();
 }
 
 function status(response, postData) {
     console.log("Request handler 'start' was called.");
-    response.writeHead(200, {"Content-Type": defaultHeader});
+    writeHeaders(response);
     response.write("Users (test)\n\n");
     response.write(userManager.users.length + "\n");
     for(var i = 0; i < userManager.users.length; i++) {
@@ -220,7 +222,7 @@ function status(response, postData) {
 // Returns a list of games that are updated or not on the client side
 function gameList(response, postData) {
     console.log("Request handler 'gameList' was called.");
-    response.writeHead(200, {"Content-Type": defaultHeader});
+    writeHeaders(response);
     console.log("Received post data: " + postData);
 
     var receivedJson = JSON.parse(postData);

@@ -346,6 +346,7 @@ MainMenu.prototype.requestNewUser = function () {
 MainMenu.prototype.receivedNewUser = function (user) {
     this.hideLoadingMessage();
     console.log("A new user was returned successfully!");
+    console.log("UserID: " + user.userID)
     localStorage.setItem('user', user);
     this.setLoggedInUser(user);
 }

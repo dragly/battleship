@@ -23,14 +23,14 @@ Communicator.prototype.ajaxCall = function(url,callback, data) {
     var self = this;
 
     $.ajax({
-        type: "POST",
-        url: url,
-        data: JSON.stringify(data),
-        timeout: 5000,
-        success: callback,
-        error: self.errorHandler,
-        dataType: "text"
-    });
+               type: "POST",
+               url: url,
+               data: JSON.stringify(data),
+               timeout: 5000,
+               success: callback,
+               error: self.errorHandler,
+               dataType: "json"
+           });
 }
 
 Communicator.prototype.requestPlaceBoats = function (user, game, ourBoats, callback) {
@@ -53,23 +53,18 @@ Communicator.prototype.receivedPlaceBoats = function (receivedData, callback) {
 Communicator.prototype.requestNewUser = function (callback) {
     var self = this;
     this.ajaxCall("http://" + this.serverUrl + "/newUser", function(response) { self.receivedNewUser(response, callback); });
-//    var xmlhttp = new XMLHttpRequest();
-//    xmlhttp.onreadystatechange = function() {
-//        console.log(xmlhttp.readyState);
-//        console.log(xmlhttp.responseText);
-//    }
-//    xmlhttp.open("POST", "http://" + this.serverUrl + "/newUser", true);
-//    xmlhttp.send(null);
 }
 
 Communicator.prototype.receivedNewUser = function (receivedUserData, callback) {
 
     //TODO Error handling if user could not be created
-  console.log("receivedUserData: " + receivedUserData);
+    console.log("receivedUserData: " + receivedUserData);
+    console.log("receivedUserData.userID: " + receivedUserData.userID);
     var myUser = new User();
     myUser.userID = receivedUserData.userID;
     myUser.username = receivedUserData.userID;
     myUser.password = receivedUserData.password;
+    console.log("MyUser.userID: " + myUser.userID);
     callback(myUser);
 }
 
@@ -115,9 +110,9 @@ Communicator.prototype.requestGameList = function (user, games, callback) {
         var game = games[i];
         console.log("game.turn: " + game.turn);
         gamesToRequests.push({
-            turn: game.turn,
-            gameID: game.gameID
-        });
+                                 turn: game.turn,
+                                 gameID: game.gameID
+                             });
     }
     var params = { user: user.authData(), games: gamesToRequests };
     this.ajaxCall("http://" + this.serverUrl + "/gameList", function (response) { self.receivedGameList(response, callback); }, params);
